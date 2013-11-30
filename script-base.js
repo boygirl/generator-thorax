@@ -22,15 +22,15 @@ var Generator = module.exports = function Generator() {
    * line
    */
 
-  // if (typeof this.options.coffee === 'undefined') {
-  //   if (this.expandFiles('js/**/*.coffee').length > 0) { // choose cs if any cs files exist in js/
-  //     this.options.coffee = true;
-  //   }
-  //   if (this.options.js) {
-  //     this.options.coffee = false;
-  //   }
-  // }
-  // this.env.options.coffee = this.options.coffee;
+  if (typeof this.options.coffee === 'undefined') {
+    if (this.expandFiles('js/**/*.coffee').length > 0) { // choose cs if any cs files exist in js/
+      this.options.coffee = true;
+    }
+    if (this.options.js) {
+      this.options.coffee = false;
+    }
+  }
+  this.env.options.coffee = this.options.coffee;
 
   /**
    * set path where templates will be looked for when using this.template,
@@ -51,8 +51,6 @@ var Generator = module.exports = function Generator() {
   /**
    * Set the appame, appPath and testPath for all sub generators.
    */
-
-
 
   // set the appPath where generated app files will be output to
   this.env.options.appPath = path.join(process.cwd(), 'js');

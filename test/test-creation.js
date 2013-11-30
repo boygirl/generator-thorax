@@ -1,4 +1,4 @@
-/* global describe, beforeEach, it */
+/* global describe, beforeEach, it, before */
 var path    = require('path');
 var chai = require('chai');
 var expect = chai.expect;
@@ -33,7 +33,12 @@ helpers.assertFileHasNoContent = function(file, reg) {
   assert.ok(!reg.test(body), file + ' DID MATCH, STAHP!, control flow the following content or fix the test: match \'' + reg + '\'.');
 };
 
-describe('thorax generator', function () {
+function requireOption(option, message) {
+  if (typeof option === 'undefined') { throw new Error(message); }
+  return option;
+};
+
+describe('yo thorax:app', function () {
   beforeEach(function (done) {
     helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
       if (err) { return done(err); }
@@ -78,6 +83,8 @@ describe('thorax generator', function () {
       ['js/model.js', /Thorax.Model.extend\(\{/],
       ['js/collection.js', /Thorax.Collection.extend\(\{/],
       ['js/helpers.js', /define\(\['handlebars', 'thorax'\]/],
+      ['js/main.js', /'helpers'/],
+      ['main.js', /deps: \['main'\]/],
       'public/index.html',
       'dist/index.html',
       'css/base.css',
@@ -96,8 +103,35 @@ describe('thorax generator', function () {
     helpers.assertFiles(expected);
   });
 
-  describe('Thorax Router', function () {
-    it('generates a Backbone router', function (done) {
+});
+
+describe('thorax sub generators', function () {
+
+  beforeEach(function (done) {
+    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
+      if (err) { return done(err); }
+
+      this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
+      this.app.options['skip-install'] = true;
+
+      helpers.mockPrompt(this.app, {
+        'newDirectory': false,
+        'starterApp': "None",
+        'styleProcessor': "none",
+        'includeBootstrap': false,
+        'includeCoffeeScript': requireOption(this.includeCoffeeScript, "Forgot to provide includeCoffeeScript"),
+        'useZepto': false
+      });
+
+      this.app.run({}, done);
+    }.bind(this));
+  });
+
+  describe('yo thorax:router foo', function () {
+    describe('When app is JS based(not CS)', function () {
+      before(function() { this.includeCoffeeScript = false; });
+
+      it('generates a Backbone router in javascript', function (done) {
       var router = helpers.createGenerator('thorax:router', ['../../router'], ['foo']);
 
       router.run([], function () {
@@ -107,9 +141,30 @@ describe('thorax generator', function () {
         done();
       });
     });
+
+
+    });
+
+    describe('When app is CS based', function () {
+      before(function() { this.includeCoffeeScript = true; });
+
+      it('generates a backbone router in coffeescript', function (done) {
+        var router = helpers.createGenerator('thorax:router', ['../../router'], 'foo');
+
+        router.run([], function () {
+          helpers.assertFiles([
+            ['js/routers/foo.coffee', /Backbone.Router.extend/]
+          ]);
+          done();
+        });
+      });
+
+    });
   });
 
-  describe('Thorax View', function () {
+  describe('yo thorax:view foo', function () {
+    before(function() { this.includeCoffeeScript = false; });
+
     it('generates a Thorax view', function (done) {
       var view = helpers.createGenerator('thorax:view', ['../../view'], ['foo']);
 
@@ -124,8 +179,10 @@ describe('thorax generator', function () {
     });
   });
 
-  describe('Thorax Model', function () {
-    it('generates a Thorax model', function (done) {
+  describe('yo thorax:model', function () {
+    before(function() { this.includeCoffeeScript = false; });
+
+    it('generates a Thorax model foo', function (done) {
       var model = helpers.createGenerator('thorax:model', ['../../model'], ['foo']);
 
       model.run([], function () {
@@ -138,7 +195,9 @@ describe('thorax generator', function () {
     });
   });
 
-  describe('Thorax Collection', function () {
+  describe('yo thorax:collection foo', function () {
+    before(function() { this.includeCoffeeScript = false; });
+
     it('generates a Thorax collection', function (done) {
       var collection = helpers.createGenerator('thorax:collection', ['../../collection'], ['foo']);
 
@@ -152,7 +211,8 @@ describe('thorax generator', function () {
     });
   });
 
-  describe('Thorax Collection View', function () {
+  describe('yo thorax:collection-view fooBar', function () {
+
     it('generates a Thorax collection view', function (done) {
       var collectionView = helpers.createGenerator('thorax:collection-view', ['../../collection-view'], ['fooBar']);
 
@@ -168,7 +228,6 @@ describe('thorax generator', function () {
       });
     });
   });
-
 });
 
 describe('CoffeeScript', function () {
