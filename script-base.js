@@ -52,38 +52,48 @@ var Generator = module.exports = function Generator() {
    * Set the appame, appPath and testPath for all sub generators.
    */
 
-  // try {
-  //   this.appname = require(path.join(process.cwd(), 'bower.json')).name;
-  // } catch (e) {
-  //   this.appname = path.basename(process.cwd());
-  // }
-  // this.appname = this._.slugify(this._.humanize(this.appname));
 
-  // if (typeof this.env.options.appPath === 'undefined') {
-  //   try {
-  //     this.env.options.appPath = require(path.join(process.cwd(), 'bower.json')).appPath;
-  //   } catch (e) {}
-  //   this.env.options.appPath = this.env.options.appPath || 'app';
-  // }
 
-  // if (typeof this.env.options.testPath === 'undefined') {
-  //   try {
-  //     this.env.options.testPath = require(path.join(process.cwd(), 'bower.json')).testPath;
-  //   } catch (e) {}
-  //   this.env.options.testPath = this.env.options.testPath || 'test/spec';
-  // }
+  // set the appPath where generated app files will be output to
+  this.env.options.appPath = path.join(process.cwd(), 'js');
+  // set the testPath, where generated test files will be output to
+  this.env.options.testPath = path.join(process.cwd(), 'test');
 
+  // TODO: write a test for this and then uncomment, also manually check it works
+    // get appPath inside package.json, set when app was generated, useful
+    // making sure the user is running generator from current working
+    // directory(but not a perfect solution)
+    // this.appName = JSON.parse(this.readFileAsString('package.json')).appName;
+    // Check that appName and process.cwd() match to avoid errors when generating
+    // outside the root of the app
+    // if (this.appName != process.cwd()) {
+    //   throw new Error('When using a sub generator, please make sure your in the root of your app\n' +
+    //                   'If you are in the root of your app, please make sure the appName setting inside
+    //                   package.json matches the name of your apps root directory\n' +
+    //                   'or manually pass --skip-appPath-check to override');
+    // }
 };
 
 util.inherits(Generator, yeoman.generators.NamedBase);
 
-//
-// Generator.prototype.appTemplate = function (src, dest) {
-//   yeoman.generators.Base.prototype.template.apply(this, [
-//     src + this.scriptSuffix,
-//     path.join(this.env.options.appPath, dest) + this.scriptSuffix
-//   ]);
-// };
+/**
+ * Abstraction for `this.template(src, dest)` for use in sub generators
+ *
+ * - src is relative to templates/javascript or templates/coffeescript
+ *   depedning on what is being output
+ * - dest is relative to your-app-name/js/ and should not contain the
+ *   .js or .coffee
+ *
+ */
+Generator.prototype.appTemplate = function (src, dest) {
+  // calculate the destination file, without extension via name given to generator
+  var abstractDest = path.join(dest, this._.dasherize(this.name));
+
+  yeoman.generators.Base.prototype.template.apply(this, [
+    src + this.scriptSuffix,
+    path.join(this.env.options.appPath, abstractDest) + this.scriptSuffix
+  ]);
+};
 
 // Generator.prototype.testTemplate = function (src, dest) {
 //   yeoman.generators.Base.prototype.template.apply(this, [

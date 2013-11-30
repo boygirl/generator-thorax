@@ -1,21 +1,20 @@
 'use strict';
 var util = require('util');
-var yeoman = require('yeoman-generator');
 var path = require('path');
+var ScriptBase = require('../script-base.js');
 
-var CollectionViewGenerator = module.exports = function CollectionViewGenerator(args, options, config) {
-  yeoman.generators.NamedBase.apply(this, arguments);
-  this.sourceRoot(path.join(__dirname, '../templates'));
+var Generator = module.exports = function Generator() {
+  ScriptBase.apply(this, arguments);
 };
 
-util.inherits(CollectionViewGenerator, yeoman.generators.NamedBase);
+util.inherits(Generator, ScriptBase);
 
-CollectionViewGenerator.prototype.files = function files() {
+Generator.prototype.files = function files() {
   // next line same as view/index.js but prefer minimal duplication over inheritance
   this.write('js/templates/' + this._.dasherize(this.name) + '.hbs', '');
 
   // files specific to collection view
-  this.template('collection-view.js', path.join('js/views', this._.dasherize(this.name) + '.js'));
+  this.appTemplate('collection-view', 'views');
   this.write('js/templates/' + this._.dasherize(this.name) + '-item.hbs', '');
   this.write('js/templates/' + this._.dasherize(this.name) + '-empty.hbs', '');
 };
