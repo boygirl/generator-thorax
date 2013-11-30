@@ -31,7 +31,7 @@ helpers.assertFileHasNoContent = function(file, reg) {
 
   var body = fs.readFileSync(file, 'utf8');
   assert.ok(!reg.test(body), file + ' DID MATCH, STAHP!, control flow the following content or fix the test: match \'' + reg + '\'.');
-}
+};
 
 describe('thorax generator', function () {
   beforeEach(function (done) {
@@ -154,7 +154,7 @@ describe('thorax generator', function () {
 
   describe('Thorax Collection View', function () {
     it('generates a Thorax collection view', function (done) {
-      var collectionView = helpers.createGenerator('thorax:collection-view', ['../../collection-view'], ['fooBar']);
+      var collectionView = helpers.createGenerator('thorax:collection-view', ['../../collection-view', '../../view'], ['fooBar']);
 
       collectionView.run([], function () {
         helpers.assertFiles([
@@ -169,6 +169,7 @@ describe('thorax generator', function () {
     });
   });
 
+  // TODO: remove nesting starting here, when tests pass
   describe('CoffeeScript', function () {
     beforeEach(function (done) {
       helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {

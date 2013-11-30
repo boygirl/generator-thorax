@@ -10,9 +10,7 @@ var ViewGenerator = module.exports = function ViewGenerator(args, options, confi
 util.inherits(ViewGenerator, yeoman.generators.NamedBase);
 
 ViewGenerator.prototype.files = function files() {
-  this.template(
-    'view.js',
-    path.join('js/views', this._.dasherize(this.name) + '.js')
+  this.template('view.js', path.join('js/views', this._.dasherize(this.name) + '.js')
   );
   this.write('js/templates/' + this._.dasherize(this.name) + '.hbs', '');
 };
