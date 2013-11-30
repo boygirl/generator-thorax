@@ -1,15 +1,13 @@
 'use strict';
 var util = require('util');
-var yeoman = require('yeoman-generator');
-var path = require('path'); // duplication
+var ScriptBase = require('../script-base.js');
 
-var CollectionGenerator = module.exports = function CollectionGenerator(args, options, config) {
-  yeoman.generators.NamedBase.apply(this, arguments);
-  this.sourceRoot(path.join(__dirname, '../templates')); // duplication
+var Generator = module.exports = function Generator() {
+  ScriptBase.apply(this, arguments);
 };
 
-util.inherits(CollectionGenerator, yeoman.generators.NamedBase);
+util.inherits(Generator, ScriptBase);
 
-CollectionGenerator.prototype.files = function files() {
-  this.template('collection.js', path.join('js/collections', this._.dasherize(this.name) + '.js')); // duplication
+Generator.prototype.files = function files() {
+  this.appTemplate('collection', 'collections');
 };
