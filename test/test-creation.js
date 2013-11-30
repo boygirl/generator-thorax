@@ -102,7 +102,8 @@ describe('thorax generator', function () {
 
       router.run([], function () {
         helpers.assertFiles([
-          ['js/routers/foo.js', /Backbone.Router.extend\(\{/]
+          ['js/routers/foo.js', /Backbone.Router.extend\(\{/],
+          ['js/routers/foo.js', /function \(Backbone, RootView\)/]
         ]);
         done();
       });
