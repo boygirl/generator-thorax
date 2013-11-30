@@ -154,7 +154,7 @@ describe('thorax generator', function () {
 
   describe('Thorax Collection View', function () {
     it('generates a Thorax collection view', function (done) {
-      var collectionView = helpers.createGenerator('thorax:collection-view', ['../../collection-view', '../../view'], ['fooBar']);
+      var collectionView = helpers.createGenerator('thorax:collection-view', ['../../collection-view'], ['fooBar']);
 
       collectionView.run([], function () {
         helpers.assertFiles([

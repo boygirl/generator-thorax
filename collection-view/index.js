@@ -5,13 +5,13 @@ var path = require('path');
 
 var CollectionViewGenerator = module.exports = function CollectionViewGenerator(args, options, config) {
   yeoman.generators.NamedBase.apply(this, arguments);
+  this.sourceRoot(path.join(__dirname, '../templates'));
 };
 
 util.inherits(CollectionViewGenerator, yeoman.generators.NamedBase);
 
 CollectionViewGenerator.prototype.files = function files() {
-  // this line same as in view/index.js but prefer this minimal duplication over
-  // confusing inheritance.
+  // next line same as view/index.js but prefer minimal duplication over inheritance
   this.write('js/templates/' + this._.dasherize(this.name) + '.hbs', '');
 
   // files specific to collection view
