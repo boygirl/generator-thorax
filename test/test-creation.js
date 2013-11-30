@@ -1,4 +1,4 @@
-/* global describe, beforeEach, it */
+/* global describe, beforeEach, it, before */
 var path    = require('path');
 var chai = require('chai');
 var expect = chai.expect;
@@ -349,7 +349,7 @@ describe('CoffeeScript', function () {
 
       helpers.mockPrompt(this.app, {
         'newDirectory': true,
-        'starterApp': this.starterApp || (function() {throw new Error("Forgot to provide starter app")})(),
+        'starterApp': requireOption(this.starterApp, "Forgot to provide starter app"),
         'styleProcessor': "none",
         'includeBootstrap': false,
         'includeCoffeeScript': true,
@@ -377,7 +377,8 @@ describe('CoffeeScript', function () {
     it('generates hello world specific coffeescript templates', function () {
       helpers.assertFiles([
         'js/routers/hello-world.coffee',
-        'js/views/hello-world/index.coffee'
+        'js/views/hello-world/index.coffee',
+        ['js/main.coffee', /'routers\/hello-world'/],
       ]);
     });
   });
@@ -392,7 +393,8 @@ describe('CoffeeScript', function () {
     it('generates todo-list app coffeescript templates', function () {
       helpers.assertFiles([
         'js/routers/todo-list.coffee',
-        'js/views/todo-list/index.coffee'
+        'js/views/todo-list/index.coffee',
+        ['js/main.coffee', /'routers\/todo-list'/],
       ]);
     });
   });
