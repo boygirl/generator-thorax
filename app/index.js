@@ -159,7 +159,7 @@ ThoraxGenerator.prototype.app = function () {
   this.mkdir('js/collections');
 
   this.copy('seed/js/views/root' + scriptExt, 'js/views/root' + scriptExt);
-  this.copy('seed/js/helpers.js', 'js/helpers.js');
+  this.copy('seed/js/helpers' + scriptExt, 'js/helpers' + scriptExt);
   this.copy('seed/js/templates/root.hbs', 'js/templates/root.hbs');
 
   this.copy('_server.js', 'server.js');

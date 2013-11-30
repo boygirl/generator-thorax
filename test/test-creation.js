@@ -1,4 +1,4 @@
-/* global describe, beforeEach, it, before */
+/* global describe, beforeEach, it */
 var path    = require('path');
 var chai = require('chai');
 var expect = chai.expect;
@@ -322,6 +322,24 @@ describe('thorax sub generators', function () {
 });
 
 describe('CoffeeScript', function () {
+
+  sharedExamples.create('generate default coffeescript templates', function () {
+    it('generates default coffeescript templates', function () {
+      helpers.assertFiles([
+        'js/views',
+        'js/models',
+        'js/collections',
+        'js/views/root.coffee',
+        ['js/helpers.coffee', /define \["handlebars", "thorax"\], \(Handlebars\) ->/],
+        ['js/view.coffee', /class View extends Thorax.View/],
+        ['js/model.coffee', /class Model extends Thorax.Model/],
+        ['js/collection.coffee', /class Collection extends Thorax.Collection/],
+        ['js/collection-view.coffee', /class CollectionView extends Thorax.CollectionView/],
+        ['js/layout-view.coffee', /class LayoutView extends Thorax.LayoutView/]
+      ]);
+    });
+  });
+
   beforeEach(function (done) {
     helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
       if (err) { return done(err); }
@@ -331,7 +349,7 @@ describe('CoffeeScript', function () {
 
       helpers.mockPrompt(this.app, {
         'newDirectory': true,
-        'starterApp': "None",
+        'starterApp': this.starterApp || (function() {throw new Error("Forgot to provide starter app")})(),
         'styleProcessor': "none",
         'includeBootstrap': false,
         'includeCoffeeScript': true,
@@ -342,95 +360,43 @@ describe('CoffeeScript', function () {
     }.bind(this));
   });
 
-  it('generates CoffeeScript templates when requested', function () {
-    helpers.assertFiles([
-      'js/views',
-      'js/models',
-      'js/collections',
-      'js/views/root.coffee',
-      ['js/view.coffee', /class View extends Thorax.View/],
-      ['js/model.coffee', /class Model extends Thorax.Model/],
-      ['js/collection.coffee', /class Collection extends Thorax.Collection/],
-      ['js/collection-view.coffee', /class CollectionView extends Thorax.CollectionView/],
-      ['js/layout-view.coffee', /class LayoutView extends Thorax.LayoutView/]
-    ]);
-  });
-});
-
-describe('CoffeeScript - HelloWorld', function () {
-  beforeEach(function (done) {
-    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
-      if (err) { return done(err); }
-
-      this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
-      this.app.options['skip-install'] = true;
-
-      helpers.mockPrompt(this.app, {
-        'newDirectory': true,
-        'starterApp': "Hello World",
-        'styleProcessor': "none",
-        'includeBootstrap': false,
-        'includeCoffeeScript': true,
-        'useZepto': false
-      });
-
-      this.app.run({}, done);
-    }.bind(this));
+  describe('When starterApp is "None"', function () {
+    before(function () {
+      this.starterApp = "None";
+    });
+    sharedExamples.invoke('generate default coffeescript templates');
   });
 
-  it('generates CoffeeScript templates when requested', function () {
-    helpers.assertFiles([
-      'js/views',
-      'js/models',
-      'js/collections',
-      'js/views/root.coffee',
-      'js/routers/hello-world.coffee',
-      'js/views/hello-world/index.coffee',
-      ['js/view.coffee', /class View extends Thorax.View/],
-      ['js/model.coffee', /class Model extends Thorax.Model/],
-      ['js/collection.coffee', /class Collection extends Thorax.Collection/],
-      ['js/collection-view.coffee', /class CollectionView extends Thorax.CollectionView/],
-      ['js/layout-view.coffee', /class LayoutView extends Thorax.LayoutView/]
-    ]);
-  });
-});
+  describe('When starterApp is "Hello World"', function () {
+    before(function () {
+      this.starterApp = "Hello World";
+    });
 
-describe('CoffeeScript - Todo List', function () {
-  beforeEach(function (done) {
-    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
-      if (err) { return done(err); }
+    sharedExamples.invoke('generate default coffeescript templates');
 
-      this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
-      this.app.options['skip-install'] = true;
-
-      helpers.mockPrompt(this.app, {
-        'newDirectory': true,
-        'starterApp': "Todo List",
-        'styleProcessor': "none",
-        'includeBootstrap': false,
-        'includeCoffeeScript': true,
-        'useZepto': false
-      });
-
-      this.app.run({}, done);
-    }.bind(this));
+    it('generates hello world specific coffeescript templates', function () {
+      helpers.assertFiles([
+        'js/routers/hello-world.coffee',
+        'js/views/hello-world/index.coffee'
+      ]);
+    });
   });
 
-  it('generates CoffeeScript templates when requested', function () {
-    helpers.assertFiles([
-      'js/views',
-      'js/models',
-      'js/collections',
-      'js/views/root.coffee',
-      'js/routers/todo-list.coffee',
-      'js/views/todo-list/index.coffee',
-      ['js/view.coffee', /class View extends Thorax.View/],
-      ['js/model.coffee', /class Model extends Thorax.Model/],
-      ['js/collection.coffee', /class Collection extends Thorax.Collection/],
-      ['js/collection-view.coffee', /class CollectionView extends Thorax.CollectionView/],
-      ['js/layout-view.coffee', /class LayoutView extends Thorax.LayoutView/]
-    ]);
+  describe('When starterApp is "Todo List"', function () {
+    before(function () {
+      this.starterApp = "Todo List";
+    });
+
+    sharedExamples.invoke('generate default coffeescript templates');
+
+    it('generates todo-list app coffeescript templates', function () {
+      helpers.assertFiles([
+        'js/routers/todo-list.coffee',
+        'js/views/todo-list/index.coffee'
+      ]);
+    });
   });
+
 });
 
 describe('jQuery or Zepto option', function () {
