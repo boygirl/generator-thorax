@@ -1,17 +1,18 @@
-var util      = require('util');
-var path      = require('path');
-var Generator = require('../lib/generator');
+'use strict';
+var util = require('util');
+var yeoman = require('yeoman-generator');
+var path = require('path');
 
-var ViewGenerator = module.exports = function () {
-  Generator.apply(this, arguments);
+var ViewGenerator = module.exports = function ViewGenerator(args, options, config) {
+  yeoman.generators.NamedBase.apply(this, arguments);
 };
 
-util.inherits(ViewGenerator, Generator);
+util.inherits(ViewGenerator, yeoman.generators.NamedBase);
 
-ViewGenerator.prototype._name  = 'view';
-ViewGenerator.prototype.askFor = Generator.prototype.askFor;
-
-ViewGenerator.prototype.createView = function () {
-  this._renderTemplate('js/views');
+ViewGenerator.prototype.files = function files() {
+  this.template(
+    'view.js',
+    path.join('js/views', this._.dasherize(this.name) + '.js')
+  );
   this.write('js/templates/' + this._.dasherize(this.name) + '.hbs', '');
 };

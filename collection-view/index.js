@@ -1,6 +1,6 @@
 var util          = require('util');
 var path          = require('path');
-var ViewGenerator = require('../view');
+var ViewGenerator = require('../old-view');
 
 var CollectionViewGenerator = module.exports = function () {
   ViewGenerator.apply(this, arguments);
