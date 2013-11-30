@@ -75,6 +75,7 @@ describe('App Generators', function () {
           ['js/collection.coffee', /class Collection extends Thorax.Collection/],
           ['js/collection-view.coffee', /class CollectionView extends Thorax.CollectionView/],
           ['js/layout-view.coffee', /class LayoutView extends Thorax.LayoutView/],
+          ['js/main.js', /'cs!helpers'/],
           ['js/main.js', /'cs!views\/root'/],
         ]);
       });

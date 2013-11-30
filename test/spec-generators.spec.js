@@ -123,19 +123,31 @@ describe('Test testing setup for generated applications', function () {
   });
 
   describe('when choosing javascript', function () {
-    before(function() { this.includeCoffeeScript = false; });
+    before(function () { this.includeCoffeeScript = false; });
     sharedExamples.invoke('files included with js or cs apps');
 
     it('generates some example tests to help when getting started', function () {
       helpers.assertFiles([
         'test/app.spec.js',
-        'test/views/root.spec.js'
+        ['test/views/root.spec.js', /\['views\/root'\]/]
       ]);
     });
+
     it('shows examples of how to use helpers with fixtures', function () {
       helpers.assertFiles([
         'test/helpers/helpers.spec.js',
         'test/helpers/view-helpers.spec.js',
+      ]);
+    });
+
+    it('generates test/test-setup-browser to require js spec files', function () {
+      var file = 'test/test-setup-browser.js';
+
+      helpers.assertFiles([
+        [file, /'.\/app\.spec'/],
+        [file, /'.\/views\/root.spec'/],
+        [file, /'.\/helpers\/helpers.spec'/],
+        [file, /'.\/helpers\/view-helpers.spec'/],
       ]);
     });
   });
@@ -155,6 +167,17 @@ describe('Test testing setup for generated applications', function () {
       helpers.assertFiles([
         'test/helpers/helpers.spec.coffee',
         'test/helpers/view-helpers.spec.coffee',
+      ]);
+    });
+
+    it('generates test/test-setup-browser to require coffee spec files', function () {
+      var file = 'test/test-setup-browser.js';
+
+      helpers.assertFiles([
+        [file, /'cs!.\/app\.spec'/],
+        [file, /'cs!.\/views\/root.spec'/],
+        [file, /'cs!.\/helpers\/helpers.spec'/],
+        [file, /'cs!.\/helpers\/view-helpers.spec'/],
       ]);
     });
 
