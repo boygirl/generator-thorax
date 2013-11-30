@@ -1,7 +1,6 @@
-# Sanity check
 describe "tests work", ->
   it "should do something", ->
-    expect(true).to.be true
+    expect(true).to.be.true
 
 
 describe "Global variable we want in our tests", ->
