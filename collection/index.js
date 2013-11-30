@@ -11,5 +11,5 @@ var CollectionGenerator = module.exports = function CollectionGenerator(args, op
 util.inherits(CollectionGenerator, yeoman.generators.NamedBase);
 
 CollectionGenerator.prototype.files = function files() {
-  this.template('collection.js', path.join('js/collections', this._.dasherize(this.name) + '.js'));
+  this.template('collection.js', path.join('js/collections', this._.dasherize(this.name) + '.js')); // duplication
 };
