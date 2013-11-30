@@ -154,7 +154,8 @@ describe('thorax sub generators', function () {
 
         router.run([], function () {
           helpers.assertFiles([
-            ['js/routers/foo.coffee', /Backbone.Router.extend/]
+            ['js/routers/foo.coffee', /Backbone.Router.extend/],
+            ['js/routers/foo.coffee', /\(Backbone, RootView\) ->/]
           ]);
           done();
         });

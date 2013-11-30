@@ -1,6 +1,6 @@
 define [
   "backbone",
   "cs!views/root"
-], (RootView, Backbone) ->
+], (Backbone, RootView) ->
   Backbone.Router.extend
     routes: {}
