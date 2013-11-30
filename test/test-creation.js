@@ -169,8 +169,420 @@ describe('thorax generator', function () {
     });
   });
 
-  // TODO: remove nesting starting here, when tests pass
-  describe('CoffeeScript', function () {
+});
+
+describe('CoffeeScript', function () {
+  beforeEach(function (done) {
+    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
+      if (err) { return done(err); }
+
+      this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
+      this.app.options['skip-install'] = true;
+
+      helpers.mockPrompt(this.app, {
+        'newDirectory': true,
+        'starterApp': "None",
+        'styleProcessor': "none",
+        'includeBootstrap': false,
+        'includeCoffeeScript': true,
+        'useZepto': false
+      });
+
+      this.app.run({}, done);
+    }.bind(this));
+  });
+
+  it('generates CoffeeScript templates when requested', function () {
+    helpers.assertFiles([
+      'js/views',
+      'js/models',
+      'js/collections',
+      'js/views/root.coffee',
+      ['js/view.coffee', /class View extends Thorax.View/],
+      ['js/model.coffee', /class Model extends Thorax.Model/],
+      ['js/collection.coffee', /class Collection extends Thorax.Collection/],
+      ['js/collection-view.coffee', /class CollectionView extends Thorax.CollectionView/],
+      ['js/layout-view.coffee', /class LayoutView extends Thorax.LayoutView/]
+    ]);
+  });
+});
+
+describe('CoffeeScript - HelloWorld', function () {
+  beforeEach(function (done) {
+    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
+      if (err) { return done(err); }
+
+      this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
+      this.app.options['skip-install'] = true;
+
+      helpers.mockPrompt(this.app, {
+        'newDirectory': true,
+        'starterApp': "Hello World",
+        'styleProcessor': "none",
+        'includeBootstrap': false,
+        'includeCoffeeScript': true,
+        'useZepto': false
+      });
+
+      this.app.run({}, done);
+    }.bind(this));
+  });
+
+  it('generates CoffeeScript templates when requested', function () {
+    helpers.assertFiles([
+      'js/views',
+      'js/models',
+      'js/collections',
+      'js/views/root.coffee',
+      'js/routers/hello-world.coffee',
+      'js/views/hello-world/index.coffee',
+      ['js/view.coffee', /class View extends Thorax.View/],
+      ['js/model.coffee', /class Model extends Thorax.Model/],
+      ['js/collection.coffee', /class Collection extends Thorax.Collection/],
+      ['js/collection-view.coffee', /class CollectionView extends Thorax.CollectionView/],
+      ['js/layout-view.coffee', /class LayoutView extends Thorax.LayoutView/]
+    ]);
+  });
+});
+
+describe('CoffeeScript - Todo List', function () {
+  beforeEach(function (done) {
+    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
+      if (err) { return done(err); }
+
+      this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
+      this.app.options['skip-install'] = true;
+
+      helpers.mockPrompt(this.app, {
+        'newDirectory': true,
+        'starterApp': "Todo List",
+        'styleProcessor': "none",
+        'includeBootstrap': false,
+        'includeCoffeeScript': true,
+        'useZepto': false
+      });
+
+      this.app.run({}, done);
+    }.bind(this));
+  });
+
+  it('generates CoffeeScript templates when requested', function () {
+    helpers.assertFiles([
+      'js/views',
+      'js/models',
+      'js/collections',
+      'js/views/root.coffee',
+      'js/routers/todo-list.coffee',
+      'js/views/todo-list/index.coffee',
+      ['js/view.coffee', /class View extends Thorax.View/],
+      ['js/model.coffee', /class Model extends Thorax.Model/],
+      ['js/collection.coffee', /class Collection extends Thorax.Collection/],
+      ['js/collection-view.coffee', /class CollectionView extends Thorax.CollectionView/],
+      ['js/layout-view.coffee', /class LayoutView extends Thorax.LayoutView/]
+    ]);
+  });
+});
+
+describe('jQuery or Zepto option', function () {
+
+  beforeEach(function (done){
+    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
+      if (err) { return done(err); }
+
+      this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
+      this.app.options['skip-install'] = true;
+
+      helpers.mockPrompt(this.app, {
+        'newDirectory': false,
+        'starterApp': "None",
+        'styleProcessor': "none",
+        'includeBootstrap': false,
+        'includeCoffeeScript': false,
+        'useZepto': this.useZeptoOption
+      });
+
+      this.app.run({}, done);
+    }.bind(this));
+  });
+
+  describe('jQuery', function () {
+    before(function () {
+      this.useZeptoOption = false;
+    });
+
+    it('is included when selected in the prompt', function () {
+      helpers.assertFiles([
+        ['bower.json', /jquery/],
+        ['js/main.js', /jquery/],
+        ['tasks/options/requirejs.js', /bower_components\/jquery\/jquery/],
+        ['tasks/options/requirejs.js', /deps: \['jquery', 'underscore'\]/],
+        ['main.js', /bower_components\/jquery\/jquery/],
+        ['main.js', /deps: \['jquery', 'underscore'\]/]
+      ]);
+    });
+  });
+
+  describe('Zepto', function () {
+    before(function () {
+      this.useZeptoOption = true;
+    });
+
+    it('is included when selected in the prompt', function () {
+      helpers.assertFiles([
+        ['bower.json', /zepto/],
+        ['js/main.js', /zepto/],
+        ['tasks/options/requirejs.js', /bower_components\/zepto\/zepto/],
+        ['tasks/options/requirejs.js', /deps: \['zepto', 'underscore'\]/],
+        ['tasks/options/requirejs.js', /exports: '\$'/],
+        ['main.js', /'bower_components\/zepto\/zepto'/],
+        ['main.js', /deps: \['zepto', 'underscore'\]/],
+        ['main.js', /exports: '\$'/],
+      ]);
+    });
+  });
+
+});
+
+describe('Style Processors', function(){
+
+  sharedExamples.create('should not generate css/base.css', function () {
+    helpers.assertNoFile('css/base.css');
+  });
+
+  beforeEach(function (done){
+    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
+      if (err) { return done(err); }
+
+      this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
+      this.app.options['skip-install'] = true;
+
+      helpers.mockPrompt(this.app, {
+        'newDirectory': false,
+        'starterApp': "None",
+        'styleProcessor': this.styleOption,
+        'includeBootstrap': false,
+        'includeCoffeeScript': false,
+        'useZepto': false
+      });
+
+      this.app.run({}, done);
+    }.bind(this));
+  });
+
+  describe('SASS', function () {
+    before(function () {
+      this.styleOption = "sass";
+    });
+
+    sharedExamples.invoke('should not generate css/base.css');
+    it('should generate css/base.scss', function () {
+      helpers.assertFile('css/base.scss');
+    });
+    it('is included when selected in the prompt', function () {
+      helpers.assertFiles([
+        'tasks/options/sass.js',
+        ['tasks/styles.js', /'sass'/],
+        ['package.json', /grunt-contrib-sass/]
+      ]);
+    });
+
+  });
+
+  describe('LESS(comes with bootstrap by default)', function () {
+    before(function () {
+      this.styleOption = "less";
+    });
+
+    it('is included when selected in the prompt', function () {
+      helpers.assertFiles([
+        'tasks/options/less.js',
+        ['tasks/styles.js', /'less'/],
+        ['package.json', /grunt-contrib-less/],
+        ['bower.json', /"bootstrap"/]
+      ]);
+    });
+    it('generates css/base.less instead of css/base.css', function () {
+      helpers.assertFile('css/base.less', /import "..\/bower_components\/bootstrap\/less\/bootstrap";/);
+
+    });
+  });
+
+  describe('Stylus', function () {
+    before(function () {
+      this.styleOption = "stylus";
+    });
+
+    sharedExamples.invoke('should not generate css/base.css');
+    it('should generate css/base.scss', function () {
+      helpers.assertFile('css/base.styl');
+    });
+
+    it('is included when selected in the prompt', function () {
+      helpers.assertFiles([
+        'tasks/options/stylus.js',
+        ['tasks/styles.js', /'stylus'/],
+        ['package.json', /grunt-contrib-stylus/]
+      ]);
+    });
+  });
+});
+
+describe('Testing', function () {
+
+  beforeEach(function (done){
+    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
+      if (err) { return done(err); }
+
+      this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
+      this.app.options['skip-install'] = true;
+
+      helpers.mockPrompt(this.app, {
+        'newDirectory': false,
+        'starterApp': "None",
+        'styleProcessor': "none",
+        'includeBootstrap': false,
+        'includeCoffeeScript': false,
+        'useZepto': false
+      });
+
+      this.app.run({}, done);
+    }.bind(this));
+  });
+  it('generates an app that supports testing with karma', function () {
+    helpers.assertFiles([
+      'karma.conf.js',
+      'tasks/options/karma.js',
+      ['package.json', /"karma"/],
+      ['package.json', /"karma-mocha"/],
+      ['package.json', /"grunt-karma"/],
+      ['package.json', /"karma-safari-launcher"/]
+    ]);
+  });
+  it('generates an app that supports testing with phantomjs', function () {
+    helpers.assertFiles([
+      'tasks/options/mocha_phantomjs.js',
+      ['package.json', /"mocha-phantomjs"/],
+      ['package.json', /"phantomjs"/],
+      ['package.json', /"grunt-mocha-phantomjs"/]
+    ]);
+  });
+  it('generates a test directory setup with requirejs', function () {
+    helpers.assertFiles([
+      'test/index.html',
+      'test/app.spec.js', // branch for cs version?
+      'test/main.js',
+      'test/main.karma.js',
+      'test/test-setup-all.js',
+      'test/test-setup-browser.js',
+      'test/collections/.gitkeep',
+      'test/fixtures/.gitkeep',
+      'test/helpers/.gitkeep',
+      'test/models/.gitkeep',
+      'test/routers/.gitkeep',
+      'test/utils/.gitkeep',
+      'test/views/.gitkeep',
+    ]);
+    it('generates some example tests to help when getting started', function () {
+      // TODO: how deep should we go into this?
+      // - will it matter which app we generated(perhaps).
+      // - which directories are the most important? helpers and views?
+      // - provide js and cs versions? or just always support cs(current way)
+      helpers.assertFiles([
+        'test/views/root.spec.js',
+        'test/views/root-coffee.spec.coffee', // TODO: cs support? right now it's just default
+      ]);
+    });
+    it('shows examples of how to use helpers with fixtures', function () {
+      helpers.assertFiles([
+        'test/fixtures/adding-machine.hbs',
+        'test/fixtures/example.hbs',
+        'test/fixtures/example2.html',
+        'test/fixtures/example3.hbs',
+        'test/fixtures/get-excited.hbs',
+        'test/helpers/helpers.spec.js',
+        'test/helpers/view-helpers.spec.js',
+      ]);
+    });
+    it('generates bower with right dependencies', function () {
+      helpers.assertFiles([
+        ['bower.json', /"fixtures"/],
+        ['bower.json', /"mocha"/],
+        ['bower.json', /"chai"/],
+        ['bower.json', /"sinon"/],
+        ['bower.json', /"sinon-chai"/]
+      ]);
+    });
+    it('provides support for travis ci out of the box', function () {
+      helpers.assertFile('.travis.yml');
+    });
+  });
+});
+
+describe('JSHint support', function () {
+  beforeEach(function (done) {
+    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
+      if (err) { return done(err); }
+
+      this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
+      this.app.options['skip-install'] = true;
+
+      helpers.mockPrompt(this.app, {
+        'newDirectory': true,
+        'starterApp': "None",
+        'styleProcessor': "none",
+        'includeBootstrap': false,
+        'includeCoffeeScript': false,
+        'useZepto': false
+      });
+
+      this.app.run({}, done);
+    }.bind(this));
+  });
+  it('supports js hint for every grunt tasks', function () {
+    // hard to test this, but the sentence above should always be true
+    // it should also run when watch sees any js file in the projcect change
+    helpers.assertFiles([
+      'tasks/options/jshint.js',
+      '.jshintrc',
+      ['package.json', /"grunt-contrib-jshint"/],
+    ]);
+  });
+});
+
+describe('Requirejs abstraction', function () {
+  beforeEach(function (done) {
+    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
+      if (err) { return done(err); }
+
+      this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
+      this.app.options['skip-install'] = true;
+
+      helpers.mockPrompt(this.app, {
+        'newDirectory': true,
+        'starterApp': "None",
+        'styleProcessor': "none",
+        'includeBootstrap': false,
+        'includeCoffeeScript': false,
+        'useZepto': false
+      });
+
+      this.app.run({}, done);
+    }.bind(this));
+  });
+  it('public/index.html should provide first config during development', function () {
+    helpers.assertFile('public/index.html', /baseUrl: '..\/js'/);
+  });
+  it('should generate a base main.js file for development use', function () {
+    helpers.assertFile('main.js');
+  });
+  it('uses requirejs-hbs JIT handlebars compiler(tagged version)', function () {
+    helpers.assertFile('bower.json', /"text"/);
+    helpers.assertFile('bower.json', /"requirejs-hbs": "trombom\/requirejs-hbs#v0.1"/);
+  });
+});
+
+describe('Production Build', function () {
+  describe('The happy path(all options false, normal css)', function () {
     beforeEach(function (done) {
       helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
         if (err) { return done(err); }
@@ -183,183 +595,6 @@ describe('thorax generator', function () {
           'starterApp': "None",
           'styleProcessor': "none",
           'includeBootstrap': false,
-          'includeCoffeeScript': true,
-          'useZepto': false
-        });
-
-        this.app.run({}, done);
-      }.bind(this));
-    });
-
-    it('generates CoffeeScript templates when requested', function () {
-      helpers.assertFiles([
-        'js/views',
-        'js/models',
-        'js/collections',
-        'js/views/root.coffee',
-        ['js/view.coffee', /class View extends Thorax.View/],
-        ['js/model.coffee', /class Model extends Thorax.Model/],
-        ['js/collection.coffee', /class Collection extends Thorax.Collection/],
-        ['js/collection-view.coffee', /class CollectionView extends Thorax.CollectionView/],
-        ['js/layout-view.coffee', /class LayoutView extends Thorax.LayoutView/]
-      ]);
-    });
-  });
-
-  describe('CoffeeScript - HelloWorld', function () {
-    beforeEach(function (done) {
-      helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
-        if (err) { return done(err); }
-
-        this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
-        this.app.options['skip-install'] = true;
-
-        helpers.mockPrompt(this.app, {
-          'newDirectory': true,
-          'starterApp': "Hello World",
-          'styleProcessor': "none",
-          'includeBootstrap': false,
-          'includeCoffeeScript': true,
-          'useZepto': false
-        });
-
-        this.app.run({}, done);
-      }.bind(this));
-    });
-
-    it('generates CoffeeScript templates when requested', function () {
-      helpers.assertFiles([
-        'js/views',
-        'js/models',
-        'js/collections',
-        'js/views/root.coffee',
-        'js/routers/hello-world.coffee',
-        'js/views/hello-world/index.coffee',
-        ['js/view.coffee', /class View extends Thorax.View/],
-        ['js/model.coffee', /class Model extends Thorax.Model/],
-        ['js/collection.coffee', /class Collection extends Thorax.Collection/],
-        ['js/collection-view.coffee', /class CollectionView extends Thorax.CollectionView/],
-        ['js/layout-view.coffee', /class LayoutView extends Thorax.LayoutView/]
-      ]);
-    });
-  });
-
-  describe('CoffeeScript - Todo List', function () {
-    beforeEach(function (done) {
-      helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
-        if (err) { return done(err); }
-
-        this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
-        this.app.options['skip-install'] = true;
-
-        helpers.mockPrompt(this.app, {
-          'newDirectory': true,
-          'starterApp': "Todo List",
-          'styleProcessor': "none",
-          'includeBootstrap': false,
-          'includeCoffeeScript': true,
-          'useZepto': false
-        });
-
-        this.app.run({}, done);
-      }.bind(this));
-    });
-
-    it('generates CoffeeScript templates when requested', function () {
-      helpers.assertFiles([
-        'js/views',
-        'js/models',
-        'js/collections',
-        'js/views/root.coffee',
-        'js/routers/todo-list.coffee',
-        'js/views/todo-list/index.coffee',
-        ['js/view.coffee', /class View extends Thorax.View/],
-        ['js/model.coffee', /class Model extends Thorax.Model/],
-        ['js/collection.coffee', /class Collection extends Thorax.Collection/],
-        ['js/collection-view.coffee', /class CollectionView extends Thorax.CollectionView/],
-        ['js/layout-view.coffee', /class LayoutView extends Thorax.LayoutView/]
-      ]);
-    });
-  });
-
-  describe('jQuery or Zepto option', function () {
-
-    beforeEach(function (done){
-      helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
-        if (err) { return done(err); }
-
-        this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
-        this.app.options['skip-install'] = true;
-
-        helpers.mockPrompt(this.app, {
-          'newDirectory': false,
-          'starterApp': "None",
-          'styleProcessor': "none",
-          'includeBootstrap': false,
-          'includeCoffeeScript': false,
-          'useZepto': this.useZeptoOption
-        });
-
-        this.app.run({}, done);
-      }.bind(this));
-    });
-
-    describe('jQuery', function () {
-      before(function () {
-        this.useZeptoOption = false;
-      });
-
-      it('is included when selected in the prompt', function () {
-        helpers.assertFiles([
-          ['bower.json', /jquery/],
-          ['js/main.js', /jquery/],
-          ['tasks/options/requirejs.js', /bower_components\/jquery\/jquery/],
-          ['tasks/options/requirejs.js', /deps: \['jquery', 'underscore'\]/],
-          ['main.js', /bower_components\/jquery\/jquery/],
-          ['main.js', /deps: \['jquery', 'underscore'\]/]
-        ]);
-      });
-    });
-
-    describe('Zepto', function () {
-      before(function () {
-        this.useZeptoOption = true;
-      });
-
-      it('is included when selected in the prompt', function () {
-        helpers.assertFiles([
-          ['bower.json', /zepto/],
-          ['js/main.js', /zepto/],
-          ['tasks/options/requirejs.js', /bower_components\/zepto\/zepto/],
-          ['tasks/options/requirejs.js', /deps: \['zepto', 'underscore'\]/],
-          ['tasks/options/requirejs.js', /exports: '\$'/],
-          ['main.js', /'bower_components\/zepto\/zepto'/],
-          ['main.js', /deps: \['zepto', 'underscore'\]/],
-          ['main.js', /exports: '\$'/],
-        ]);
-      });
-    });
-
-  });
-
-  describe('Style Processors', function(){
-
-    sharedExamples.create('should not generate css/base.css', function () {
-      helpers.assertNoFile('css/base.css');
-    });
-
-    beforeEach(function (done){
-      helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
-        if (err) { return done(err); }
-
-        this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
-        this.app.options['skip-install'] = true;
-
-        helpers.mockPrompt(this.app, {
-          'newDirectory': false,
-          'starterApp': "None",
-          'styleProcessor': this.styleOption,
-          'includeBootstrap': false,
           'includeCoffeeScript': false,
           'useZepto': false
         });
@@ -368,248 +603,12 @@ describe('thorax generator', function () {
       }.bind(this));
     });
 
-    describe('SASS', function () {
-      before(function () {
-        this.styleOption = "sass";
-      });
-
-      sharedExamples.invoke('should not generate css/base.css');
-      it('should generate css/base.scss', function () {
-        helpers.assertFile('css/base.scss');
-      });
-      it('is included when selected in the prompt', function () {
-        helpers.assertFiles([
-          'tasks/options/sass.js',
-          ['tasks/styles.js', /'sass'/],
-          ['package.json', /grunt-contrib-sass/]
-        ]);
-      });
-
-    });
-
-    describe('LESS(comes with bootstrap by default)', function () {
-      before(function () {
-        this.styleOption = "less";
-      });
-
-      it('is included when selected in the prompt', function () {
-        helpers.assertFiles([
-          'tasks/options/less.js',
-          ['tasks/styles.js', /'less'/],
-          ['package.json', /grunt-contrib-less/],
-          ['bower.json', /"bootstrap"/]
-        ]);
-      });
-      it('generates css/base.less instead of css/base.css', function () {
-        helpers.assertFile('css/base.less', /import "..\/bower_components\/bootstrap\/less\/bootstrap";/);
-
-      });
-    });
-
-    describe('Stylus', function () {
-      before(function () {
-        this.styleOption = "stylus";
-      });
-
-      sharedExamples.invoke('should not generate css/base.css');
-      it('should generate css/base.scss', function () {
-        helpers.assertFile('css/base.styl');
-      });
-
-      it('is included when selected in the prompt', function () {
-        helpers.assertFiles([
-          'tasks/options/stylus.js',
-          ['tasks/styles.js', /'stylus'/],
-          ['package.json', /grunt-contrib-stylus/]
-        ]);
-      });
-    });
-  });
-
-  describe('Testing', function () {
-
-    beforeEach(function (done){
-      helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
-        if (err) { return done(err); }
-
-        this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
-        this.app.options['skip-install'] = true;
-
-        helpers.mockPrompt(this.app, {
-          'newDirectory': false,
-          'starterApp': "None",
-          'styleProcessor': "none",
-          'includeBootstrap': false,
-          'includeCoffeeScript': false,
-          'useZepto': false
-        });
-
-        this.app.run({}, done);
-      }.bind(this));
-    });
-    it('generates an app that supports testing with karma', function () {
+    it('generates dist/index.html', function () {
       helpers.assertFiles([
-        'karma.conf.js',
-        'tasks/options/karma.js',
-        ['package.json', /"karma"/],
-        ['package.json', /"karma-mocha"/],
-        ['package.json', /"grunt-karma"/],
-        ['package.json', /"karma-safari-launcher"/]
+        ['dist/index.html', /href="screen.css"/],
+        ['dist/index.html', /src="main.js"/]
       ]);
     });
-    it('generates an app that supports testing with phantomjs', function () {
-      helpers.assertFiles([
-        'tasks/options/mocha_phantomjs.js',
-        ['package.json', /"mocha-phantomjs"/],
-        ['package.json', /"phantomjs"/],
-        ['package.json', /"grunt-mocha-phantomjs"/]
-      ]);
-    });
-    it('generates a test directory setup with requirejs', function () {
-      helpers.assertFiles([
-        'test/index.html',
-        'test/app.spec.js', // branch for cs version?
-        'test/main.js',
-        'test/main.karma.js',
-        'test/test-setup-all.js',
-        'test/test-setup-browser.js',
-        'test/collections/.gitkeep',
-        'test/fixtures/.gitkeep',
-        'test/helpers/.gitkeep',
-        'test/models/.gitkeep',
-        'test/routers/.gitkeep',
-        'test/utils/.gitkeep',
-        'test/views/.gitkeep',
-      ]);
-      it('generates some example tests to help when getting started', function () {
-        // TODO: how deep should we go into this?
-        // - will it matter which app we generated(perhaps).
-        // - which directories are the most important? helpers and views?
-        // - provide js and cs versions? or just always support cs(current way)
-        helpers.assertFiles([
-          'test/views/root.spec.js',
-          'test/views/root-coffee.spec.coffee', // TODO: cs support? right now it's just default
-        ]);
-      });
-      it('shows examples of how to use helpers with fixtures', function () {
-        helpers.assertFiles([
-          'test/fixtures/adding-machine.hbs',
-          'test/fixtures/example.hbs',
-          'test/fixtures/example2.html',
-          'test/fixtures/example3.hbs',
-          'test/fixtures/get-excited.hbs',
-          'test/helpers/helpers.spec.js',
-          'test/helpers/view-helpers.spec.js',
-        ]);
-      });
-      it('generates bower with right dependencies', function () {
-        helpers.assertFiles([
-          ['bower.json', /"fixtures"/],
-          ['bower.json', /"mocha"/],
-          ['bower.json', /"chai"/],
-          ['bower.json', /"sinon"/],
-          ['bower.json', /"sinon-chai"/]
-        ]);
-      });
-      it('provides support for travis ci out of the box', function () {
-        helpers.assertFile('.travis.yml');
-      });
-    });
+
   });
-
-  describe('JSHint support', function () {
-    beforeEach(function (done) {
-      helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
-        if (err) { return done(err); }
-
-        this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
-        this.app.options['skip-install'] = true;
-
-        helpers.mockPrompt(this.app, {
-          'newDirectory': true,
-          'starterApp': "None",
-          'styleProcessor': "none",
-          'includeBootstrap': false,
-          'includeCoffeeScript': false,
-          'useZepto': false
-        });
-
-        this.app.run({}, done);
-      }.bind(this));
-    });
-    it('supports js hint for every grunt tasks', function () {
-      // hard to test this, but the sentence above should always be true
-      // it should also run when watch sees any js file in the projcect change
-      helpers.assertFiles([
-        'tasks/options/jshint.js',
-        '.jshintrc',
-        ['package.json', /"grunt-contrib-jshint"/],
-      ]);
-    });
-  });
-
-  describe('Requirejs abstraction', function () {
-    beforeEach(function (done) {
-      helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
-        if (err) { return done(err); }
-
-        this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
-        this.app.options['skip-install'] = true;
-
-        helpers.mockPrompt(this.app, {
-          'newDirectory': true,
-          'starterApp': "None",
-          'styleProcessor': "none",
-          'includeBootstrap': false,
-          'includeCoffeeScript': false,
-          'useZepto': false
-        });
-
-        this.app.run({}, done);
-      }.bind(this));
-    });
-    it('public/index.html should provide first config during development', function () {
-      helpers.assertFile('public/index.html', /baseUrl: '..\/js'/);
-    });
-    it('should generate a base main.js file for development use', function () {
-      helpers.assertFile('main.js');
-    });
-    it('uses requirejs-hbs JIT handlebars compiler(tagged version)', function () {
-      helpers.assertFile('bower.json', /"text"/);
-      helpers.assertFile('bower.json', /"requirejs-hbs": "trombom\/requirejs-hbs#v0.1"/);
-    });
-  });
-
-  describe('Production Build', function () {
-    describe('The happy path(all options false, normal css)', function () {
-      beforeEach(function (done) {
-        helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
-          if (err) { return done(err); }
-
-          this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
-          this.app.options['skip-install'] = true;
-
-          helpers.mockPrompt(this.app, {
-            'newDirectory': true,
-            'starterApp': "None",
-            'styleProcessor': "none",
-            'includeBootstrap': false,
-            'includeCoffeeScript': false,
-            'useZepto': false
-          });
-
-          this.app.run({}, done);
-        }.bind(this));
-      });
-
-      it('generates dist/index.html', function () {
-        helpers.assertFiles([
-          ['dist/index.html', /href="screen.css"/],
-          ['dist/index.html', /src="main.js"/]
-        ]);
-      });
-
-    });
-  });
-
 });
