@@ -163,70 +163,161 @@ describe('thorax sub generators', function () {
   });
 
   describe('yo thorax:view foo', function () {
-    before(function() { this.includeCoffeeScript = false; });
+    describe('when app is JS based(not CS)', function () {
 
-    it('generates a Thorax view', function (done) {
-      var view = helpers.createGenerator('thorax:view', ['../../view'], ['foo']);
+      before(function() { this.includeCoffeeScript = false; });
 
-      view.run([], function () {
-        helpers.assertFiles([
-          ['js/views/foo.js', /View.extend\(\{/],
-          ['js/views/foo.js', /name: 'foo'/],
-          'js/templates/foo.hbs'
-        ]);
-        done();
+      it('generates a Thorax view', function (done) {
+        var view = helpers.createGenerator('thorax:view', ['../../view'], ['foo']);
+
+        view.run([], function () {
+          helpers.assertFiles([
+            ['js/views/foo.js', /View.extend\(\{/],
+            ['js/views/foo.js', /name: 'foo'/],
+            'js/templates/foo.hbs'
+          ]);
+          done();
+        });
+      });
+    });
+
+    describe('when app is CS based', function () {
+      before(function() { this.includeCoffeeScript = true; });
+
+      it('generates a Thorax view', function (done) {
+        var view = helpers.createGenerator('thorax:view', ['../../view'], ['foo']);
+
+        view.run([], function () {
+          helpers.assertFiles([
+            ['js/views/foo.coffee', /View.extend/],
+            ['js/views/foo.coffee', /name: 'foo'/],
+            ['js/views/foo.coffee', /'hbs!templates\/foo'/],
+            ['js/views/foo.coffee', /'cs!view'/],
+            'js/templates/foo.hbs'
+          ]);
+          done();
+        });
       });
     });
   });
 
   describe('yo thorax:model', function () {
-    before(function() { this.includeCoffeeScript = false; });
+    describe('when app is JS based(not CS)', function () {
+      before(function() { this.includeCoffeeScript = false; });
 
-    it('generates a Thorax model foo', function (done) {
-      var model = helpers.createGenerator('thorax:model', ['../../model'], ['foo']);
+      it('generates a Thorax model', function (done) {
+        var model = helpers.createGenerator('thorax:model', ['../../model'], ['foo']);
 
-      model.run([], function () {
-        helpers.assertFiles([
-          ['js/models/foo.js', /Model.extend\(\{/],
-          ['js/models/foo.js', /name: 'foo'/]
-        ]);
-        done();
+        model.run([], function () {
+          helpers.assertFiles([
+            ['js/models/foo.js', /Model.extend\(\{/],
+            ['js/models/foo.js', /name: 'foo'/]
+          ]);
+          done();
+        });
+      });
+
+    });
+
+    describe('when app is CS based', function () {
+      before(function() { this.includeCoffeeScript = true; });
+
+      it('generates a Thorax model', function (done) {
+        var model = helpers.createGenerator('thorax:model', ['../../model'], ['foo']);
+
+        model.run([], function () {
+          helpers.assertFiles([
+            ['js/models/foo.coffee', /Model.extend/],
+            ['js/models/foo.coffee', /name: 'foo'/]
+          ]);
+          done();
+        });
       });
     });
   });
 
   describe('yo thorax:collection foo', function () {
-    before(function() { this.includeCoffeeScript = false; });
+    describe('when app is JS based(not CS)', function () {
 
-    it('generates a Thorax collection', function (done) {
-      var collection = helpers.createGenerator('thorax:collection', ['../../collection'], ['foo']);
+      before(function() { this.includeCoffeeScript = false; });
 
-      collection.run([], function () {
-        helpers.assertFiles([
-          ['js/collections/foo.js', /Collection.extend\(\{/],
-          ['js/collections/foo.js', /name: 'foo'/]
-        ]);
-        done();
+      it('generates a Thorax collection', function (done) {
+        var collection = helpers.createGenerator('thorax:collection', ['../../collection'], ['foo']);
+
+        collection.run([], function () {
+          helpers.assertFiles([
+            ['js/collections/foo.js', /Collection.extend\(\{/],
+            ['js/collections/foo.js', /name: 'foo'/]
+          ]);
+          done();
+        });
+      });
+
+    });
+
+    describe('when app is CS based', function () {
+      before(function() { this.includeCoffeeScript = true; });
+
+      it('generates a Thorax collection', function (done) {
+        var collection = helpers.createGenerator('thorax:collection', ['../../collection'], ['foo']);
+
+        collection.run([], function () {
+          helpers.assertFiles([
+            ['js/collections/foo.coffee', /Collection.extend/],
+            ['js/collections/foo.coffee', /name: 'foo'/]
+          ]);
+          done();
+        });
       });
     });
   });
 
   describe('yo thorax:collection-view fooBar', function () {
+    describe('when app is JS based(not CS)', function () {
 
-    it('generates a Thorax collection view', function (done) {
-      var collectionView = helpers.createGenerator('thorax:collection-view', ['../../collection-view'], ['fooBar']);
+      before(function() { this.includeCoffeeScript = false; });
 
-      collectionView.run([], function () {
-        helpers.assertFiles([
-          ['js/views/foo-bar.js', /CollectionView.extend\(\{/],
-          ['js/views/foo-bar.js', /name: 'fooBar'/],
-          'js/templates/foo-bar.hbs',
-          'js/templates/foo-bar-item.hbs',
-          'js/templates/foo-bar-empty.hbs'
-        ]);
-        done();
+      it('generates a Thorax collection view', function (done) {
+        var collectionView = helpers.createGenerator('thorax:collection-view', ['../../collection-view'], ['fooBar']);
+
+        collectionView.run([], function () {
+          helpers.assertFiles([
+            ['js/views/foo-bar.js', /CollectionView.extend\(\{/],
+            ['js/views/foo-bar.js', /name: 'fooBar'/],
+            ['js/views/foo-bar.js', /'hbs!templates\/foo-bar'/],
+            ['js/views/foo-bar.js', /'hbs!templates\/foo-bar-item'/],
+            ['js/views/foo-bar.js', /'hbs!templates\/foo-bar-empty'/],
+            'js/templates/foo-bar.hbs',
+            'js/templates/foo-bar-item.hbs',
+            'js/templates/foo-bar-empty.hbs'
+          ]);
+          done();
+        });
+      });
+
+    });
+
+    describe('when the app is CS based', function () {
+      before(function() { this.includeCoffeeScript = true; });
+      it('generates a Thorax collection view', function (done) {
+        var collectionView = helpers.createGenerator('thorax:collection-view', ['../../collection-view'], ['fooBar']);
+
+        collectionView.run([], function () {
+          helpers.assertFiles([
+            ['js/views/foo-bar.coffee', /CollectionView.extend/],
+            ['js/views/foo-bar.coffee', /name: 'fooBar'/],
+            ['js/views/foo-bar.coffee', /'hbs!templates\/foo-bar'/],
+            ['js/views/foo-bar.coffee', /'hbs!templates\/foo-bar-item'/],
+            ['js/views/foo-bar.coffee', /'hbs!templates\/foo-bar-empty'/],
+            'js/templates/foo-bar.hbs',
+            'js/templates/foo-bar-item.hbs',
+            'js/templates/foo-bar-empty.hbs'
+          ]);
+          done();
+        });
       });
     });
+
   });
 });
 
