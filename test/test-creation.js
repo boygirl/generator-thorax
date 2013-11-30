@@ -1,4 +1,4 @@
-/* global describe, beforeEach, it */
+/* global describe, beforeEach, it, before */
 var path    = require('path');
 var chai = require('chai');
 var expect = chai.expect;
@@ -33,7 +33,12 @@ helpers.assertFileHasNoContent = function(file, reg) {
   assert.ok(!reg.test(body), file + ' DID MATCH, STAHP!, control flow the following content or fix the test: match \'' + reg + '\'.');
 };
 
-describe('thorax generator', function () {
+function requireOption(option, message) {
+  if (typeof option === 'undefined') { throw new Error(message); }
+  return option;
+};
+
+describe('yo thorax:app', function () {
   beforeEach(function (done) {
     helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
       if (err) { return done(err); }
@@ -78,6 +83,8 @@ describe('thorax generator', function () {
       ['js/model.js', /Thorax.Model.extend\(\{/],
       ['js/collection.js', /Thorax.Collection.extend\(\{/],
       ['js/helpers.js', /define\(\['handlebars', 'thorax'\]/],
+      ['js/main.js', /'helpers'/],
+      ['main.js', /deps: \['main'\]/],
       'public/index.html',
       'dist/index.html',
       'css/base.css',
@@ -96,8 +103,35 @@ describe('thorax generator', function () {
     helpers.assertFiles(expected);
   });
 
-  describe('Thorax Router', function () {
-    it('generates a Backbone router', function (done) {
+});
+
+describe('thorax sub generators', function () {
+
+  beforeEach(function (done) {
+    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
+      if (err) { return done(err); }
+
+      this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
+      this.app.options['skip-install'] = true;
+
+      helpers.mockPrompt(this.app, {
+        'newDirectory': false,
+        'starterApp': "None",
+        'styleProcessor': "none",
+        'includeBootstrap': false,
+        'includeCoffeeScript': requireOption(this.includeCoffeeScript, "Forgot to provide includeCoffeeScript"),
+        'useZepto': false
+      });
+
+      this.app.run({}, done);
+    }.bind(this));
+  });
+
+  describe('yo thorax:router foo', function () {
+    describe('When app is JS based(not CS)', function () {
+      before(function() { this.includeCoffeeScript = false; });
+
+      it('generates a Backbone router in javascript', function (done) {
       var router = helpers.createGenerator('thorax:router', ['../../router'], ['foo']);
 
       router.run([], function () {
@@ -108,71 +142,205 @@ describe('thorax generator', function () {
         done();
       });
     });
+
+
+    });
+
+    describe('When app is CS based', function () {
+      before(function() { this.includeCoffeeScript = true; });
+
+      it('generates a backbone router in coffeescript', function (done) {
+        var router = helpers.createGenerator('thorax:router', ['../../router'], 'foo');
+
+        router.run([], function () {
+          helpers.assertFiles([
+            ['js/routers/foo.coffee', /Backbone.Router.extend/]
+          ]);
+          done();
+        });
+      });
+
+    });
   });
 
-  describe('Thorax View', function () {
-    it('generates a Thorax view', function (done) {
-      var view = helpers.createGenerator('thorax:view', ['../../view'], ['foo']);
+  describe('yo thorax:view foo', function () {
+    describe('when app is JS based(not CS)', function () {
 
-      view.run([], function () {
-        helpers.assertFiles([
-          ['js/views/foo.js', /View.extend\(\{/],
-          ['js/views/foo.js', /name: 'foo'/],
-          'js/templates/foo.hbs'
-        ]);
-        done();
+      before(function() { this.includeCoffeeScript = false; });
+
+      it('generates a Thorax view', function (done) {
+        var view = helpers.createGenerator('thorax:view', ['../../view'], ['foo']);
+
+        view.run([], function () {
+          helpers.assertFiles([
+            ['js/views/foo.js', /View.extend\(\{/],
+            ['js/views/foo.js', /name: 'foo'/],
+            'js/templates/foo.hbs'
+          ]);
+          done();
+        });
+      });
+    });
+
+    describe('when app is CS based', function () {
+      before(function() { this.includeCoffeeScript = true; });
+
+      it('generates a Thorax view', function (done) {
+        var view = helpers.createGenerator('thorax:view', ['../../view'], ['foo']);
+
+        view.run([], function () {
+          helpers.assertFiles([
+            ['js/views/foo.coffee', /View.extend/],
+            ['js/views/foo.coffee', /name: 'foo'/],
+            ['js/views/foo.coffee', /'hbs!templates\/foo'/],
+            ['js/views/foo.coffee', /'cs!view'/],
+            'js/templates/foo.hbs'
+          ]);
+          done();
+        });
       });
     });
   });
 
-  describe('Thorax Model', function () {
-    it('generates a Thorax model', function (done) {
-      var model = helpers.createGenerator('thorax:model', ['../../model'], ['foo']);
+  describe('yo thorax:model', function () {
+    describe('when app is JS based(not CS)', function () {
+      before(function() { this.includeCoffeeScript = false; });
 
-      model.run([], function () {
-        helpers.assertFiles([
-          ['js/models/foo.js', /Model.extend\(\{/],
-          ['js/models/foo.js', /name: 'foo'/]
-        ]);
-        done();
+      it('generates a Thorax model', function (done) {
+        var model = helpers.createGenerator('thorax:model', ['../../model'], ['foo']);
+
+        model.run([], function () {
+          helpers.assertFiles([
+            ['js/models/foo.js', /Model.extend\(\{/],
+            ['js/models/foo.js', /name: 'foo'/]
+          ]);
+          done();
+        });
+      });
+
+    });
+
+    describe('when app is CS based', function () {
+      before(function() { this.includeCoffeeScript = true; });
+
+      it('generates a Thorax model', function (done) {
+        var model = helpers.createGenerator('thorax:model', ['../../model'], ['foo']);
+
+        model.run([], function () {
+          helpers.assertFiles([
+            ['js/models/foo.coffee', /Model.extend/],
+            ['js/models/foo.coffee', /name: 'foo'/]
+          ]);
+          done();
+        });
       });
     });
   });
 
-  describe('Thorax Collection', function () {
-    it('generates a Thorax collection', function (done) {
-      var collection = helpers.createGenerator('thorax:collection', ['../../collection'], ['foo']);
+  describe('yo thorax:collection foo', function () {
+    describe('when app is JS based(not CS)', function () {
 
-      collection.run([], function () {
-        helpers.assertFiles([
-          ['js/collections/foo.js', /Collection.extend\(\{/],
-          ['js/collections/foo.js', /name: 'foo'/]
-        ]);
-        done();
+      before(function() { this.includeCoffeeScript = false; });
+
+      it('generates a Thorax collection', function (done) {
+        var collection = helpers.createGenerator('thorax:collection', ['../../collection'], ['foo']);
+
+        collection.run([], function () {
+          helpers.assertFiles([
+            ['js/collections/foo.js', /Collection.extend\(\{/],
+            ['js/collections/foo.js', /name: 'foo'/]
+          ]);
+          done();
+        });
+      });
+
+    });
+
+    describe('when app is CS based', function () {
+      before(function() { this.includeCoffeeScript = true; });
+
+      it('generates a Thorax collection', function (done) {
+        var collection = helpers.createGenerator('thorax:collection', ['../../collection'], ['foo']);
+
+        collection.run([], function () {
+          helpers.assertFiles([
+            ['js/collections/foo.coffee', /Collection.extend/],
+            ['js/collections/foo.coffee', /name: 'foo'/]
+          ]);
+          done();
+        });
       });
     });
   });
 
-  describe('Thorax Collection View', function () {
-    it('generates a Thorax collection view', function (done) {
-      var collectionView = helpers.createGenerator('thorax:collection-view', ['../../collection-view'], ['fooBar']);
+  describe('yo thorax:collection-view fooBar', function () {
+    describe('when app is JS based(not CS)', function () {
 
-      collectionView.run([], function () {
-        helpers.assertFiles([
-          ['js/views/foo-bar.js', /CollectionView.extend\(\{/],
-          ['js/views/foo-bar.js', /name: 'fooBar'/],
-          'js/templates/foo-bar.hbs',
-          'js/templates/foo-bar-item.hbs',
-          'js/templates/foo-bar-empty.hbs'
-        ]);
-        done();
+      before(function() { this.includeCoffeeScript = false; });
+
+      it('generates a Thorax collection view', function (done) {
+        var collectionView = helpers.createGenerator('thorax:collection-view', ['../../collection-view'], ['fooBar']);
+
+        collectionView.run([], function () {
+          helpers.assertFiles([
+            ['js/views/foo-bar.js', /CollectionView.extend\(\{/],
+            ['js/views/foo-bar.js', /name: 'fooBar'/],
+            ['js/views/foo-bar.js', /'hbs!templates\/foo-bar'/],
+            ['js/views/foo-bar.js', /'hbs!templates\/foo-bar-item'/],
+            ['js/views/foo-bar.js', /'hbs!templates\/foo-bar-empty'/],
+            'js/templates/foo-bar.hbs',
+            'js/templates/foo-bar-item.hbs',
+            'js/templates/foo-bar-empty.hbs'
+          ]);
+          done();
+        });
+      });
+
+    });
+
+    describe('when the app is CS based', function () {
+      before(function() { this.includeCoffeeScript = true; });
+      it('generates a Thorax collection view', function (done) {
+        var collectionView = helpers.createGenerator('thorax:collection-view', ['../../collection-view'], ['fooBar']);
+
+        collectionView.run([], function () {
+          helpers.assertFiles([
+            ['js/views/foo-bar.coffee', /CollectionView.extend/],
+            ['js/views/foo-bar.coffee', /name: 'fooBar'/],
+            ['js/views/foo-bar.coffee', /'hbs!templates\/foo-bar'/],
+            ['js/views/foo-bar.coffee', /'hbs!templates\/foo-bar-item'/],
+            ['js/views/foo-bar.coffee', /'hbs!templates\/foo-bar-empty'/],
+            'js/templates/foo-bar.hbs',
+            'js/templates/foo-bar-item.hbs',
+            'js/templates/foo-bar-empty.hbs'
+          ]);
+          done();
+        });
       });
     });
-  });
 
+  });
 });
 
 describe('CoffeeScript', function () {
+
+  sharedExamples.create('generate default coffeescript templates', function () {
+    it('generates default coffeescript templates', function () {
+      helpers.assertFiles([
+        'js/views',
+        'js/models',
+        'js/collections',
+        'js/views/root.coffee',
+        ['js/helpers.coffee', /define \["handlebars", "thorax"\], \(Handlebars\) ->/],
+        ['js/view.coffee', /class View extends Thorax.View/],
+        ['js/model.coffee', /class Model extends Thorax.Model/],
+        ['js/collection.coffee', /class Collection extends Thorax.Collection/],
+        ['js/collection-view.coffee', /class CollectionView extends Thorax.CollectionView/],
+        ['js/layout-view.coffee', /class LayoutView extends Thorax.LayoutView/]
+      ]);
+    });
+  });
+
   beforeEach(function (done) {
     helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
       if (err) { return done(err); }
@@ -182,7 +350,7 @@ describe('CoffeeScript', function () {
 
       helpers.mockPrompt(this.app, {
         'newDirectory': true,
-        'starterApp': "None",
+        'starterApp': requireOption(this.starterApp, "Forgot to provide starterApp"),
         'styleProcessor': "none",
         'includeBootstrap': false,
         'includeCoffeeScript': true,
@@ -193,95 +361,45 @@ describe('CoffeeScript', function () {
     }.bind(this));
   });
 
-  it('generates CoffeeScript templates when requested', function () {
-    helpers.assertFiles([
-      'js/views',
-      'js/models',
-      'js/collections',
-      'js/views/root.coffee',
-      ['js/view.coffee', /class View extends Thorax.View/],
-      ['js/model.coffee', /class Model extends Thorax.Model/],
-      ['js/collection.coffee', /class Collection extends Thorax.Collection/],
-      ['js/collection-view.coffee', /class CollectionView extends Thorax.CollectionView/],
-      ['js/layout-view.coffee', /class LayoutView extends Thorax.LayoutView/]
-    ]);
-  });
-});
-
-describe('CoffeeScript - HelloWorld', function () {
-  beforeEach(function (done) {
-    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
-      if (err) { return done(err); }
-
-      this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
-      this.app.options['skip-install'] = true;
-
-      helpers.mockPrompt(this.app, {
-        'newDirectory': true,
-        'starterApp': "Hello World",
-        'styleProcessor': "none",
-        'includeBootstrap': false,
-        'includeCoffeeScript': true,
-        'useZepto': false
-      });
-
-      this.app.run({}, done);
-    }.bind(this));
+  describe('When starterApp is "None"', function () {
+    before(function () {
+      this.starterApp = "None";
+    });
+    sharedExamples.invoke('generate default coffeescript templates');
   });
 
-  it('generates CoffeeScript templates when requested', function () {
-    helpers.assertFiles([
-      'js/views',
-      'js/models',
-      'js/collections',
-      'js/views/root.coffee',
-      'js/routers/hello-world.coffee',
-      'js/views/hello-world/index.coffee',
-      ['js/view.coffee', /class View extends Thorax.View/],
-      ['js/model.coffee', /class Model extends Thorax.Model/],
-      ['js/collection.coffee', /class Collection extends Thorax.Collection/],
-      ['js/collection-view.coffee', /class CollectionView extends Thorax.CollectionView/],
-      ['js/layout-view.coffee', /class LayoutView extends Thorax.LayoutView/]
-    ]);
-  });
-});
+  describe('When starterApp is "Hello World"', function () {
+    before(function () {
+      this.starterApp = "Hello World";
+    });
 
-describe('CoffeeScript - Todo List', function () {
-  beforeEach(function (done) {
-    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
-      if (err) { return done(err); }
+    sharedExamples.invoke('generate default coffeescript templates');
 
-      this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
-      this.app.options['skip-install'] = true;
-
-      helpers.mockPrompt(this.app, {
-        'newDirectory': true,
-        'starterApp': "Todo List",
-        'styleProcessor': "none",
-        'includeBootstrap': false,
-        'includeCoffeeScript': true,
-        'useZepto': false
-      });
-
-      this.app.run({}, done);
-    }.bind(this));
+    it('generates hello world specific coffeescript templates', function () {
+      helpers.assertFiles([
+        'js/routers/hello-world.coffee',
+        ['js/views/hello-world/index.coffee', /cs!view/],
+        ['js/main.js', /'routers\/hello-world'/],
+      ]);
+    });
   });
 
-  it('generates CoffeeScript templates when requested', function () {
-    helpers.assertFiles([
-      'js/views',
-      'js/models',
-      'js/collections',
-      'js/views/root.coffee',
-      'js/routers/todo-list.coffee',
-      'js/views/todo-list/index.coffee',
-      ['js/view.coffee', /class View extends Thorax.View/],
-      ['js/model.coffee', /class Model extends Thorax.Model/],
-      ['js/collection.coffee', /class Collection extends Thorax.Collection/],
-      ['js/collection-view.coffee', /class CollectionView extends Thorax.CollectionView/],
-      ['js/layout-view.coffee', /class LayoutView extends Thorax.LayoutView/]
-    ]);
+  describe('When starterApp is "Todo List"', function () {
+    before(function () {
+      this.starterApp = "Todo List";
+    });
+
+    sharedExamples.invoke('generate default coffeescript templates');
+
+    it('generates todo-list app coffeescript templates', function () {
+      helpers.assertFiles([
+        'js/routers/todo-list.coffee',
+        ['js/views/todo-list/index.coffee', /cs!view/],
+        ['js/main.js', /'routers\/todo-list'/],
+      ]);
+    });
   });
+
 });
 
 describe('jQuery or Zepto option', function () {
@@ -430,78 +548,39 @@ describe('Style Processors', function(){
 
 describe('Testing', function () {
 
-  beforeEach(function (done){
-    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
-      if (err) { return done(err); }
 
-      this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
-      this.app.options['skip-install'] = true;
 
-      helpers.mockPrompt(this.app, {
-        'newDirectory': false,
-        'starterApp': "None",
-        'styleProcessor': "none",
-        'includeBootstrap': false,
-        'includeCoffeeScript': false,
-        'useZepto': false
-      });
-
-      this.app.run({}, done);
-    }.bind(this));
-  });
-  it('generates an app that supports testing with karma', function () {
-    helpers.assertFiles([
-      'karma.conf.js',
-      'tasks/options/karma.js',
-      ['package.json', /"karma"/],
-      ['package.json', /"karma-mocha"/],
-      ['package.json', /"grunt-karma"/],
-      ['package.json', /"karma-safari-launcher"/]
-    ]);
-  });
-  it('generates an app that supports testing with phantomjs', function () {
-    helpers.assertFiles([
-      'tasks/options/mocha_phantomjs.js',
-      ['package.json', /"mocha-phantomjs"/],
-      ['package.json', /"phantomjs"/],
-      ['package.json', /"grunt-mocha-phantomjs"/]
-    ]);
-  });
-  it('generates a test directory setup with requirejs', function () {
-    helpers.assertFiles([
-      'test/index.html',
-      'test/app.spec.js', // branch for cs version?
-      'test/main.js',
-      'test/main.karma.js',
-      'test/test-setup-all.js',
-      'test/test-setup-browser.js',
-      'test/collections/.gitkeep',
-      'test/fixtures/.gitkeep',
-      'test/helpers/.gitkeep',
-      'test/models/.gitkeep',
-      'test/routers/.gitkeep',
-      'test/utils/.gitkeep',
-      'test/views/.gitkeep',
-    ]);
-    it('generates some example tests to help when getting started', function () {
-      // TODO: how deep should we go into this?
-      // - will it matter which app we generated(perhaps).
-      // - which directories are the most important? helpers and views?
-      // - provide js and cs versions? or just always support cs(current way)
+  sharedExamples.create('files included with js or cs apps', function () {
+    it('generates an app that supports testing with karma', function () {
       helpers.assertFiles([
-        'test/views/root.spec.js',
-        'test/views/root-coffee.spec.coffee', // TODO: cs support? right now it's just default
+        'karma.conf.js',
+        'tasks/options/karma.js',
+        ['package.json', /"karma"/],
+        ['package.json', /"karma-mocha"/],
+        ['package.json', /"grunt-karma"/],
+        ['package.json', /"karma-safari-launcher"/]
       ]);
     });
-    it('shows examples of how to use helpers with fixtures', function () {
+    it('generates an app that supports testing with phantomjs', function () {
       helpers.assertFiles([
-        'test/fixtures/adding-machine.hbs',
-        'test/fixtures/example.hbs',
-        'test/fixtures/example2.html',
-        'test/fixtures/example3.hbs',
-        'test/fixtures/get-excited.hbs',
-        'test/helpers/helpers.spec.js',
-        'test/helpers/view-helpers.spec.js',
+        'tasks/options/mocha_phantomjs.js',
+        ['package.json', /"mocha-phantomjs"/],
+        ['package.json', /"phantomjs"/],
+        ['package.json', /"grunt-mocha-phantomjs"/]
+      ]);
+    });
+    it('generates a test directory setup with requirejs', function () {
+      helpers.assertFiles([
+        'test/index.html',
+        'test/main.js',
+        'test/main.karma.js',
+        'test/collections/.gitkeep',
+        'test/fixtures/.gitkeep',
+        'test/helpers/.gitkeep',
+        'test/models/.gitkeep',
+        'test/routers/.gitkeep',
+        'test/utils/.gitkeep',
+        'test/views/.gitkeep'
       ]);
     });
     it('generates bower with right dependencies', function () {
@@ -516,6 +595,76 @@ describe('Testing', function () {
     it('provides support for travis ci out of the box', function () {
       helpers.assertFile('.travis.yml');
     });
+    it('provides example fixtures', function () {
+      helpers.assertFiles([
+        'test/fixtures/adding-machine.hbs',
+        'test/fixtures/get-excited.hbs'
+      ]);
+    });
+    it('generates setup files', function () {
+      helpers.assertFiles([
+        'test/test-setup-all.js',
+        'test/test-setup-browser.js'
+      ]);
+    });
+  });
+
+  beforeEach(function (done){
+    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
+      if (err) { return done(err); }
+
+      this.app = helpers.createGenerator('thorax:app', ['../../app'], 'test');
+      this.app.options['skip-install'] = true;
+
+      helpers.mockPrompt(this.app, {
+        'newDirectory': false,
+        'starterApp': "None",
+        'styleProcessor': "none",
+        'includeBootstrap': false,
+        'includeCoffeeScript': requireOption(this.includeCoffeeScript, "Forgot includeCoffeeScript"),
+        'useZepto': false
+      });
+
+      this.app.run({}, done);
+    }.bind(this));
+  });
+
+  describe('when choosing javascript', function () {
+    before(function() { this.includeCoffeeScript = false; });
+    sharedExamples.invoke('files included with js or cs apps');
+
+    it('generates some example tests to help when getting started', function () {
+      helpers.assertFiles([
+        'test/app.spec.js',
+        'test/views/root.spec.js'
+      ]);
+    });
+    it('shows examples of how to use helpers with fixtures', function () {
+      helpers.assertFiles([
+        'test/helpers/helpers.spec.js',
+        'test/helpers/view-helpers.spec.js',
+      ]);
+    });
+  });
+
+  describe('when choosing CS', function () {
+    before(function() { this.includeCoffeeScript = true; });
+    sharedExamples.invoke('files included with js or cs apps');
+
+    it('generates example tests to help when getting started', function () {
+      helpers.assertFiles([
+        'test/app.spec.coffee',
+        'test/views/root.spec.coffee',
+      ]);
+    });
+
+    it('generates examples of how to use helpers with fixures', function () {
+      helpers.assertFiles([
+        'test/helpers/helpers.spec.coffee',
+        'test/helpers/view-helpers.spec.coffee',
+      ]);
+    });
+
   });
 });
 
