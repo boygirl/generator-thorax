@@ -184,7 +184,3 @@ describe('Spec Generators', function () {
 
   });
 });
-
-describe('Test testing setup for sub generator output', function () {
-  // TODO
-});
