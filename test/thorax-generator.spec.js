@@ -37,6 +37,14 @@ function requireOption(option, message) {
   return option;
 };
 
+
+/**
+ * Note: if you  get an `index of undefined error` it's likely because
+ * the features prompt is missing. It should be set to an array in cases
+ * where it's not used, aka, 'features': this.features || []
+ */
+
+
 describe('yo thorax:app', function () {
   beforeEach(function (done) {
     helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
@@ -49,9 +57,7 @@ describe('yo thorax:app', function () {
         'newDirectory': false,
         'starterApp': "None",
         'styleProcessor': "none",
-        'includeBootstrap': false,
-        'includeCoffeeScript': false,
-        'useZepto': false
+        'features': this.features || []
       });
 
       this.app.run({}, done);
@@ -116,9 +122,7 @@ describe('jQuery or Zepto option', function () {
         'newDirectory': false,
         'starterApp': "None",
         'styleProcessor': "none",
-        'includeBootstrap': false,
-        'includeCoffeeScript': false,
-        'useZepto': this.useZeptoOption
+        'features': this.features || []
       });
 
       this.app.run({}, done);
@@ -126,11 +130,7 @@ describe('jQuery or Zepto option', function () {
   });
 
   describe('jQuery', function () {
-    before(function () {
-      this.useZeptoOption = false;
-    });
-
-    it('is included when selected in the prompt', function () {
+    it('is included by default', function () {
       helpers.assertFiles([
         ['bower.json', /jquery/],
         ['js/main.js', /jquery/],
@@ -143,9 +143,8 @@ describe('jQuery or Zepto option', function () {
   });
 
   describe('Zepto', function () {
-    before(function () {
-      this.useZeptoOption = true;
-    });
+    before(function() { this.features = ['useZepto']; });
+
 
     it('is included when selected in the prompt', function () {
       helpers.assertFiles([
@@ -175,9 +174,7 @@ describe('JSHint support', function () {
         'newDirectory': true,
         'starterApp': "None",
         'styleProcessor': "none",
-        'includeBootstrap': false,
-        'includeCoffeeScript': false,
-        'useZepto': false
+        'features': this.features || []
       });
 
       this.app.run({}, done);
@@ -206,9 +203,7 @@ describe('Requirejs abstraction', function () {
         'newDirectory': true,
         'starterApp': "None",
         'styleProcessor': "none",
-        'includeBootstrap': false,
-        'includeCoffeeScript': false,
-        'useZepto': false
+        'features': this.features || []
       });
 
       this.app.run({}, done);
@@ -239,9 +234,7 @@ describe('Production Build', function () {
           'newDirectory': true,
           'starterApp': "None",
           'styleProcessor': "none",
-          'includeBootstrap': false,
-          'includeCoffeeScript': false,
-          'useZepto': false
+          'features': this.features || []
         });
 
         this.app.run({}, done);

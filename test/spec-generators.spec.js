@@ -113,9 +113,7 @@ describe('Test testing setup for generated applications', function () {
         'newDirectory': false,
         'starterApp': "None",
         'styleProcessor': "none",
-        'includeBootstrap': false,
-        'includeCoffeeScript': requireOption(this.includeCoffeeScript, "Forgot includeCoffeeScript"),
-        'useZepto': false
+        'features': this.features || [],
       });
 
       this.app.run({}, done);
@@ -123,7 +121,8 @@ describe('Test testing setup for generated applications', function () {
   });
 
   describe('when choosing javascript', function () {
-    before(function () { this.includeCoffeeScript = false; });
+    before(function() { this.features = []; });
+
     sharedExamples.invoke('files included with js or cs apps');
 
     it('generates some example tests to help when getting started', function () {
@@ -153,7 +152,7 @@ describe('Test testing setup for generated applications', function () {
   });
 
   describe('when choosing CS', function () {
-    before(function() { this.includeCoffeeScript = true; });
+    before(function() { this.features = ['includeCoffeeScript']; });
     sharedExamples.invoke('files included with js or cs apps');
 
     it('generates example tests to help when getting started', function () {

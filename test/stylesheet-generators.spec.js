@@ -55,9 +55,7 @@ describe('Style Processors', function(){
         'newDirectory': false,
         'starterApp': "None",
         'styleProcessor': this.styleOption,
-        'includeBootstrap': false,
-        'includeCoffeeScript': false,
-        'useZepto': false
+        'features': this.features || []
       });
 
       this.app.run({}, done);

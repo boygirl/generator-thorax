@@ -2,59 +2,15 @@ var fs   = require('fs');
 var path = require('path');
 var util = require('util');
 var path = require('path');
+var yeoman = require('yeoman-generator');
 var marked = require('marked');
-var Base = require('../lib/base');
+var chalk = require('chalk');
 
 var ThoraxGenerator = module.exports = function (args, options, config) {
-  Base.apply(this, arguments);
+  yeoman.generators.NamedBase.apply(this, arguments);
 
-  this.prompts.push({
-    type: 'confirm',
-    name: 'newDirectory',
-    message: 'Would you like to generate the app in a new directory?',
-    default: true
-  });
-  this.prompts.push({
-    type: 'list',
-    name: 'styleProcessor',
-    message: "Choose a css pre-processor",
-    default: 'less',
-    choices: [{
-      name: 'Less with bootstrap (default choice)',
-      value: 'less'
-    }, {
-      name: 'Sass',
-      value: 'sass'
-    }, {
-      name: 'Stylus',
-      value: 'stylus'
-    }, {
-      name: 'Plain CSS',
-      value: 'none'
-    }]
-  });
-
-  this.prompts.push({
-    type: 'confirm',
-    name: 'includeCoffeeScript',
-    message: 'Would you like to use CoffeeScript?',
-    default: false
-  });
-
-  this.prompts.push({
-    type: 'confirm',
-    name: 'useZepto',
-    message: 'Would you like to use Zepto in place of jQuery (Zepto is best for mobile apps)',
-    default: false
-  });
-
-  this.prompts.push({
-    type: 'list',
-    name: 'starterApp',
-    choices: ["Hello World", "Todo List", "None"],
-    message: 'Would you like to setup your project with a sample application?',
-    default: "Hello World"
-  });
+  this.prompts = [];
+  yeoman.generators.NamedBase.apply(this, arguments);
 
   this.on('end', function () {
     this._sanitizeBowerJSON();
@@ -66,21 +22,105 @@ var ThoraxGenerator = module.exports = function (args, options, config) {
   });
 };
 
-util.inherits(ThoraxGenerator, Base);
+util.inherits(ThoraxGenerator, yeoman.generators.NamedBase);
 
-ThoraxGenerator.prototype._name  = 'application';
-ThoraxGenerator.prototype.askFor = Base.prototype._askFor;
+ThoraxGenerator.prototype.askFor = function askFor() {
+  var cb = this.async();
+
+  // welcome message
+  if (!this.options['skip-welcome-message']) {
+    var thoraxWelcome =
+      chalk.yellow.bold("Welcome to Thorax!\n\n")
+    + chalk.yellow("Out of the box I provide a number of options\n" +
+                   "for building large scale web applications\n\n" +
+                   "However, If this is your first time I recommend hitting\n" +
+                   "enter all the way through the prompts for the ")
+    + chalk.red.bold("The Happy Path =) ") + chalk.yellow("which will provide you with\n")
+    + chalk.yellow("the most power and ease of you use out of the box")
+
+    console.log(thoraxWelcome);
+  }
+
+  var prompts = [
+    {
+      type: 'confirm',
+      name: 'newDirectory',
+      message: 'Would you like to generate the app in a new directory?',
+      default: true
+    },
+    {
+      type: 'list',
+      name: 'styleProcessor',
+      message: "Choose a css pre-processor",
+      default: 'less',
+      choices: [{
+        name: 'Less with bootstrap (default choice)',
+        value: 'less'
+      }, {
+        name: 'Sass',
+        value: 'sass'
+      }, {
+        name: 'Stylus',
+        value: 'stylus'
+      }, {
+        name: 'Plain CSS',
+        value: 'none'
+      }]
+    },
+    {
+      type: 'checkbox',
+      name: 'features',
+      message: 'Which extra features would you like?',
+      choices: [{
+        name: "CoffeeScript",
+        value: "includeCoffeeScript",
+        checked: false
+      }, {
+        name: "Zepto in place of jQuery (for mobile apps)",
+        value: "useZepto",
+        checked: false
+      }]
+    },
+    // {
+    //   type: 'confirm',
+    //   name: 'includeCoffeeScript',
+    //   message: 'Would you like to use CoffeeScript?',
+    //   default: false
+    // },
+    // {
+    //   type: 'confirm',
+    //   name: 'useZepto',
+    //   message: 'Would you like to use Zepto in place of jQuery (Zepto is best for mobile apps)',
+    //   default: false
+    // },
+    {
+      type: 'list',
+      name: 'starterApp',
+      choices: ["Hello World", "Todo List", "None"],
+      message: 'Would you like to setup your project with a sample application?',
+      default: "Hello World"
+    }
+  ];
+
+  this.prompt(prompts, function (answers) {
+    var features = answers.features;
+
+    function hasFeature(feat) { return features.indexOf(feat) !== -1; }
+
+    this.includeCoffeeScript = hasFeature('includeCoffeeScript');
+    this.useZepto = hasFeature('useZepto');
+    this.starterApp = answers.starterApp;
+    this.styleProcessor = answers.styleProcessor;
+    this.newDirectory = answers.newDirectory;
+
+    cb();
+  }.bind(this));
+};
 
 ThoraxGenerator.prototype.directory = function () {
   if (!this.newDirectory) { return; }
 
   this._checkAndCreateDirectory(this._.dasherize(this.name), this.async());
-};
-
-ThoraxGenerator.prototype.processReadme = function () {
-  var markedFile = fs.readFileSync(path.join(__dirname, '../README.md')).toString();
-  var processedMarkedFile = marked(markedFile);
-  return processedMarkedFile.replace(/{/g, '&#123;').replace(/}/g, '&#125;');
 };
 
 ThoraxGenerator.prototype._checkAndCreateDirectory = function (directory, cb) {
@@ -179,13 +219,13 @@ ThoraxGenerator.prototype.app = function () {
   this.copy('seed/tasks/options/jshint.js', 'tasks/options/jshint.js');
 
   this.copy('seed/test/index.html', 'test/index.html');
-  
+
   // these don't work well as cs files
   this.copy('seed/test/main.js', 'test/main.js');
   this.copy('seed/test/main.karma.js', 'test/main.karma.js');
   this.copy('seed/test/test-setup-all.js', 'test/test-setup-all.js');
   this.copy('seed/test/test-setup-browser.js', 'test/test-setup-browser.js');
-  
+
   this.copy('seed/test/collections/.gitkeep', 'test/collections/.gitkeep');
   this.copy('seed/test/fixtures/.gitkeep', 'test/fixtures/.gitkeep');
   this.copy('seed/test/helpers/.gitkeep', 'test/helpers/.gitkeep');
@@ -200,17 +240,23 @@ ThoraxGenerator.prototype.app = function () {
   this.copy('main.js');
   this.copy('_travis.yml', '.travis.yml');
   this.copy(path.join(__dirname, '../README.md'), 'README.md');
-    
+
 
   // js + cs versions of these files
   this.copy('seed/js/views/root' + scriptExt, 'js/views/root' + scriptExt);
   this.copy('seed/js/helpers' + scriptExt, 'js/helpers' + scriptExt);
-  
+
   this.copy('seed/test/views/root.spec' + scriptExt, 'test/views/root.spec' + scriptExt);
   this.copy('seed/test/app.spec' + scriptExt, 'test/app.spec' + scriptExt);
   this.copy('seed/test/helpers/helpers.spec' + scriptExt, 'test/helpers/helpers.spec' + scriptExt);
   this.copy('seed/test/helpers/view-helpers.spec' + scriptExt, 'test/helpers/view-helpers.spec' + scriptExt);
 
+};
+
+ThoraxGenerator.prototype.processReadme = function () {
+  var markedFile = fs.readFileSync(path.join(__dirname, '../README.md')).toString();
+  var processedMarkedFile = marked(markedFile);
+  return processedMarkedFile.replace(/{/g, '&#123;').replace(/}/g, '&#125;');
 };
 
 ThoraxGenerator.prototype.scripts = function () {

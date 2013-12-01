@@ -51,9 +51,7 @@ describe('App Generators', function () {
         'newDirectory': true,
         'starterApp': requireOption(this.starterApp, "Forgot to provide starterApp"),
         'styleProcessor': "none",
-        'includeBootstrap': false,
-        'includeCoffeeScript': requireOption(this.includeCoffeeScript, "Forgot includeCoffeeScript"),
-        'useZepto': false
+        'features': this.features || [],
       });
 
       this.app.run({}, done);
@@ -81,7 +79,7 @@ describe('App Generators', function () {
       });
     });
 
-    before(function() { this.includeCoffeeScript = true; });
+    before(function() { this.features = ['includeCoffeeScript']; });
 
     describe('When starterApp is "None"', function () {
       before(function () { this.starterApp = "None"; });
@@ -139,7 +137,7 @@ describe('App Generators', function () {
       });
     });
 
-    before(function() { this.includeCoffeeScript = false; });
+    before(function() { this.features = []; });
 
     describe('When starterApp is "None"', function () {
       before(function () { this.starterApp = "None"; });
