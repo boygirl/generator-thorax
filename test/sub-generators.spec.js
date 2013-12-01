@@ -144,7 +144,9 @@ describe('Sub Generators', function () {
         model.run([], function () {
           helpers.assertFiles([
             ['js/models/foo.js', /Model.extend\(\{/],
-            ['js/models/foo.js', /name: 'foo'/]
+            ['js/models/foo.js', /name: 'foo'/],
+            ['test/models/foo.spec.js', /require\(\['models\/foo'\], function \(Foo\)/],
+            ['test/models/foo.spec.js', /expect\(Foo\)/]
           ]);
           done();
         });
@@ -161,7 +163,9 @@ describe('Sub Generators', function () {
         model.run([], function () {
           helpers.assertFiles([
             ['js/models/foo.coffee', /Model.extend/],
-            ['js/models/foo.coffee', /name: 'foo'/]
+            ['js/models/foo.coffee', /name: 'foo'/],
+            ['test/models/foo.spec.coffee', /require \["models\/foo"\], \(Foo\)/],
+            ['test/models/foo.spec.coffee', /expect\(Foo\)/]
           ]);
           done();
         });

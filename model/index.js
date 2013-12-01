@@ -9,5 +9,5 @@ var Generator = module.exports = function Generator() {
 util.inherits(Generator, ScriptBase);
 
 Generator.prototype.files = function files() {
-  this.appTemplate('model', 'models');
+  this.generateSourceAndTest('model', 'spec/model.spec', 'models');
 };
