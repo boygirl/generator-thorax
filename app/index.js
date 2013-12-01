@@ -9,9 +9,6 @@ var chalk = require('chalk');
 var ThoraxGenerator = module.exports = function (args, options, config) {
   yeoman.generators.NamedBase.apply(this, arguments);
 
-  this.prompts = [];
-  yeoman.generators.NamedBase.apply(this, arguments);
-
   this.on('end', function () {
     this._sanitizeBowerJSON();
     this._sanitizePackageJSON();
@@ -81,18 +78,6 @@ ThoraxGenerator.prototype.askFor = function askFor() {
         checked: false
       }]
     },
-    // {
-    //   type: 'confirm',
-    //   name: 'includeCoffeeScript',
-    //   message: 'Would you like to use CoffeeScript?',
-    //   default: false
-    // },
-    // {
-    //   type: 'confirm',
-    //   name: 'useZepto',
-    //   message: 'Would you like to use Zepto in place of jQuery (Zepto is best for mobile apps)',
-    //   default: false
-    // },
     {
       type: 'list',
       name: 'starterApp',
@@ -117,7 +102,7 @@ ThoraxGenerator.prototype.askFor = function askFor() {
   }.bind(this));
 };
 
-ThoraxGenerator.prototype.directory = function () {
+ThoraxGenerator.prototype.ensureDirectory = function () {
   if (!this.newDirectory) { return; }
 
   this._checkAndCreateDirectory(this._.dasherize(this.name), this.async());
@@ -253,11 +238,7 @@ ThoraxGenerator.prototype.app = function () {
 
 };
 
-ThoraxGenerator.prototype.processReadme = function () {
-  var markedFile = fs.readFileSync(path.join(__dirname, '../README.md')).toString();
-  var processedMarkedFile = marked(markedFile);
-  return processedMarkedFile.replace(/{/g, '&#123;').replace(/}/g, '&#125;');
-};
+
 
 ThoraxGenerator.prototype.scripts = function () {
   var scriptExt = this.includeCoffeeScript ? '.coffee' : '.js';
@@ -277,11 +258,17 @@ ThoraxGenerator.prototype.projectFiles = function () {
   this.copy('gitignore', '.gitignore');
 };
 
+ThoraxGenerator.prototype._processReadme = function () {
+  var markedFile = fs.readFileSync(path.join(__dirname, '../README.md')).toString();
+  var processedMarkedFile = marked(markedFile);
+  return processedMarkedFile.replace(/{/g, '&#123;').replace(/}/g, '&#125;');
+};
+
 ThoraxGenerator.prototype.helloWorld = function() {
   var scriptExt = this.includeCoffeeScript ? '.coffee' : '.js';
 
   if (this.starterApp === 'Hello World') {
-    this.readmeContent = this.processReadme();
+    this.readmeContent = this._processReadme();
     this.mkdir('js/views/hello-world');
     this.mkdir('js/templates/hello-world');
     this.copy('seed/js/views/hello-world/index' + scriptExt, 'js/views/hello-world/index' + scriptExt);
