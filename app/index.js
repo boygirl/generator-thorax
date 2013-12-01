@@ -32,7 +32,7 @@ ThoraxGenerator.prototype.askFor = function askFor() {
                    "for building large scale web applications\n\n" +
                    "However, If this is your first time I recommend hitting\n" +
                    "enter all the way through the prompts for the ")
-    + chalk.red.bold("The Happy Path =) ") + chalk.yellow("which will provide you with\n")
+    + chalk.red.bold("The Chef's Choice =) ") + chalk.yellow("which provides\n")
     + chalk.yellow("the most power and ease of you use out of the box")
 
     console.log(thoraxWelcome);
