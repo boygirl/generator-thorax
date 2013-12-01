@@ -41,7 +41,7 @@ function requireOption(option, message) {
 // TODO: refactor all the above noise into test-setup.js, use for all test files
 
 
-describe('Test testing setup for generated applications', function () {
+describe('Spec Generators', function () {
 
   sharedExamples.create('files included with js or cs apps', function () {
     it('generates an app that supports testing with karma', function () {
@@ -91,7 +91,7 @@ describe('Test testing setup for generated applications', function () {
     it('provides example fixtures', function () {
       helpers.assertFiles([
         'test/fixtures/adding-machine.hbs',
-        'test/fixtures/get-excited.hbs'
+        'test/fixtures/hello-world.hbs'
       ]);
     });
     it('generates setup files', function () {
@@ -134,8 +134,9 @@ describe('Test testing setup for generated applications', function () {
 
     it('shows examples of how to use helpers with fixtures', function () {
       helpers.assertFiles([
-        'test/helpers/helpers.spec.js',
-        'test/helpers/view-helpers.spec.js',
+        ['test/helpers/helpers.spec.js', /Handlebars\.registerHelper\("hello-world"/],
+        ['test/helpers/helpers.spec.js', /hbsFixture\("hello-world\.hbs"\)/],
+        ['test/helpers/view-helpers.spec.js', /hbsFixture\("adding-machine\.hbs"\)/]
       ]);
     });
 
@@ -164,8 +165,9 @@ describe('Test testing setup for generated applications', function () {
 
     it('generates examples of how to use helpers with fixures', function () {
       helpers.assertFiles([
-        'test/helpers/helpers.spec.coffee',
-        'test/helpers/view-helpers.spec.coffee',
+        ['test/helpers/helpers.spec.coffee', /Handlebars\.registerHelper "hello-world"/],
+        ['test/helpers/helpers.spec.coffee', /hbsFixture\("hello-world\.hbs"\)/],
+        ['test/helpers/view-helpers.spec.coffee', /hbsFixture\("adding-machine\.hbs"\)/]
       ]);
     });
 

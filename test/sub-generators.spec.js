@@ -37,7 +37,7 @@ function requireOption(option, message) {
   return option;
 };
 
-describe('thorax sub generators', function () {
+describe('Sub Generators', function () {
 
   beforeEach(function (done) {
     helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {

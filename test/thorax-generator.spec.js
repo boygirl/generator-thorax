@@ -45,7 +45,7 @@ function requireOption(option, message) {
  */
 
 
-describe('yo thorax:app', function () {
+describe('Thorax Generator (yo thorax:app NAME)', function () {
   beforeEach(function (done) {
     helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
       if (err) { return done(err); }

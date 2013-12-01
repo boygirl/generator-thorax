@@ -220,7 +220,7 @@ ThoraxGenerator.prototype.app = function () {
   this.copy('seed/test/views/.gitkeep', 'test/views/.gitkeep');
 
   this.copy('seed/test/fixtures/adding-machine.hbs', 'test/fixtures/adding-machine.hbs');
-  this.copy('seed/test/fixtures/get-excited.hbs', 'test/fixtures/get-excited.hbs');
+  this.copy('seed/test/fixtures/hello-world.hbs', 'test/fixtures/hello-world.hbs');
 
   this.copy('main.js');
   this.copy('_travis.yml', '.travis.yml');
