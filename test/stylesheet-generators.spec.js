@@ -38,7 +38,7 @@ function requireOption(option, message) {
   return option;
 };
 
-describe('Style Processors', function(){
+describe('Stylesheet Generators', function(){
 
   sharedExamples.create('should not generate css/base.css', function () {
     helpers.assertNoFile('css/base.css');

@@ -4,9 +4,9 @@ describe "Creating a helper test", ->
     fixtures.clearCache()
 
   it "it works with fixture support", ->
-    Handlebars.registerHelper "get-excited", ->
+    Handlebars.registerHelper "hello-world", ->
       new Handlebars.SafeString("Wow, template fixtures")
 
-    view = new Thorax.View(template: hbsFixture("get-excited.hbs"))
+    view = new Thorax.View(template: hbsFixture("hello-world.hbs"))
     view.render()
     expect(view.$("h1").text()).to.eq "Wow, template fixtures"

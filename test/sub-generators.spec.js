@@ -37,7 +37,7 @@ function requireOption(option, message) {
   return option;
 };
 
-describe('thorax sub generators', function () {
+describe('Sub Generators', function () {
 
   beforeEach(function (done) {
     helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
@@ -144,7 +144,9 @@ describe('thorax sub generators', function () {
         model.run([], function () {
           helpers.assertFiles([
             ['js/models/foo.js', /Model.extend\(\{/],
-            ['js/models/foo.js', /name: 'foo'/]
+            ['js/models/foo.js', /name: 'foo'/],
+            ['test/models/foo.spec.js', /require\(\['models\/foo'\], function \(Foo\)/],
+            ['test/models/foo.spec.js', /expect\(Foo\)/]
           ]);
           done();
         });
@@ -161,7 +163,9 @@ describe('thorax sub generators', function () {
         model.run([], function () {
           helpers.assertFiles([
             ['js/models/foo.coffee', /Model.extend/],
-            ['js/models/foo.coffee', /name: 'foo'/]
+            ['js/models/foo.coffee', /name: 'foo'/],
+            ['test/models/foo.spec.coffee', /require \["models\/foo"\], \(Foo\)/],
+            ['test/models/foo.spec.coffee', /expect\(Foo\)/]
           ]);
           done();
         });
@@ -169,18 +173,20 @@ describe('thorax sub generators', function () {
     });
   });
 
-  describe('yo thorax:collection foo', function () {
+  describe('yo thorax:collection todos', function () {
     describe('when app is JS based(not CS)', function () {
 
       before(function() { this.features = []; });
 
       it('generates a Thorax collection', function (done) {
-        var collection = helpers.createGenerator('thorax:collection', ['../../collection'], ['foo']);
+        var collection = helpers.createGenerator('thorax:collection', ['../../collection'], ['todos']);
 
         collection.run([], function () {
           helpers.assertFiles([
-            ['js/collections/foo.js', /Collection.extend\(\{/],
-            ['js/collections/foo.js', /name: 'foo'/]
+            ['js/collections/todos.js', /Collection.extend\(\{/],
+            ['js/collections/todos.js', /name: 'todos'/],
+            ['test/collections/todos.spec.js', /require\(\['collections\/todos'\], function \(Todos\)/],
+            ['test/collections/todos.spec.js', /expect\(Todos\)/]
           ]);
           done();
         });
@@ -192,12 +198,14 @@ describe('thorax sub generators', function () {
       before(function() { this.features = ['includeCoffeeScript']; });
 
       it('generates a Thorax collection', function (done) {
-        var collection = helpers.createGenerator('thorax:collection', ['../../collection'], ['foo']);
+        var collection = helpers.createGenerator('thorax:collection', ['../../collection'], ['todos']);
 
         collection.run([], function () {
           helpers.assertFiles([
-            ['js/collections/foo.coffee', /Collection.extend/],
-            ['js/collections/foo.coffee', /name: 'foo'/]
+            ['js/collections/todos.coffee', /Collection.extend/],
+            ['js/collections/todos.coffee', /name: 'todos'/],
+            ['test/collections/todos.spec.coffee', /require \["collections\/todos"\], \(Todos\)/],
+            ['test/collections/todos.spec.coffee', /expect\(Todos\)/]
           ]);
           done();
         });

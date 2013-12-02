@@ -32,7 +32,7 @@ ThoraxGenerator.prototype.askFor = function askFor() {
                    "for building large scale web applications\n\n" +
                    "However, If this is your first time I recommend hitting\n" +
                    "enter all the way through the prompts for the ")
-    + chalk.red.bold("The Chef's Choice =) ") + chalk.yellow("which will provide you with\n")
+    + chalk.red.bold("The Chef's Choice =) ") + chalk.yellow("which provides\n")
     + chalk.yellow("the most power and ease of you use out of the box")
 
     console.log(thoraxWelcome);
@@ -220,9 +220,9 @@ ThoraxGenerator.prototype.app = function () {
   this.copy('seed/test/views/.gitkeep', 'test/views/.gitkeep');
 
   this.copy('seed/test/fixtures/adding-machine.hbs', 'test/fixtures/adding-machine.hbs');
-  this.copy('seed/test/fixtures/get-excited.hbs', 'test/fixtures/get-excited.hbs');
+  this.copy('seed/test/fixtures/hello-world.hbs', 'test/fixtures/hello-world.hbs');
 
-  this.copy('main.js');
+  this.copy('require-config.js');
   this.copy('_travis.yml', '.travis.yml');
   this.copy(path.join(__dirname, '../README.md'), 'README.md');
 
