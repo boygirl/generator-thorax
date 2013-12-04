@@ -44,7 +44,7 @@ For a snazzier development environment, it's recommended that you install the [T
   - `collection-view.js`
   - `collection.js`
   - `layout-view.js`
-  - `require-config.js` Require JS data-main entry point
+  - `require-config.js` **Require JS data-main entry point**
   - `model.js`
   - `view.js`
 - `node_modules`
@@ -52,7 +52,7 @@ For a snazzier development environment, it's recommended that you install the [T
   - `css` Generated or copied CSS from the `css` directory, do not modify.
   - `fonts` Any web fonts for your application, safe to modify.
   - `img` Any images, safe to modify
-  - `index.html` Do not modify, add add paths/shims to `/require-config.js`
+  - `index.html` Do not modify, add add new libraries to `/require-config.js`
 - `tasks` Put your custom grunt tasks in here
   - `options` Installed grunt options are looked up here, by file name
 - `bower.json` Third party library management via [Bower](http://bower.io/)
@@ -68,11 +68,11 @@ Every generated application comes fully loaded with an amazing development and t
 
 ** Run `grunt`**
 
-The best way to get up and running in development is to run `grunt` from the command line. This will boot a connect server and open up a browser to `http://localhost:8000/test` where you'll see the mocha test runner. This is to encourage testing, although it's not required. 
+The best way to get up and running in development is to run `grunt` from the command line. This will boot a connect server and open up a browser to `http://localhost:8000/`.
 
-To view your application, click on the link in the upper left hand corner that says [view my application in a new tab](http://localhost:8000/test), this will take you to `public/index.html`, the entry point for your app.
+Connect will also serve your tests at `http://localhost:8000/test`.
 
-At this point you'll have two tabs open in your browser, both of them synced via livereload to your application. Changing any file within your application will reload both pages so your code and your browser are never out of sync.
+LiveReload will reload both `/` and `/test` when changes are made to any file within your directory while `grunt` is running in the background.
 
 ### Testing
 
@@ -254,9 +254,13 @@ $ yo thorax todo-list
 
 Note that had you chosen `Todo List` for the sample application above, you would have generated the completed version of the app we're about to build. You may want to do this when we're finished to check your work.
 
-For more information on what is included in a blank generated application, e.g., when choosing `None`, see [what are all these files](#default-application).
-
 ### Sub Generators
+
+A sub-generator is a generator that you use within your app, after it has been initially created.
+
+Both application and test files are output from all sub-generators and CoffeeScript files will be output in place of JS files if one or more CoffeeScript files are present within your application. To override this settings pass `--js` or `--coffee` at the end any sub-generator command.
+
+In the following section, we'll build a Todo App using sub-generators. Note that test files will be omitted for brevity.
 
 ##### Generate a View:
 
@@ -297,7 +301,7 @@ define [
     template: template
 ```
 
-Those familiar with RequireJS will be thrilled to see the define() call above, and those who aren't should read the section about [require js](#requirejs) at the end of the README for short summary.
+Those familiar with RequireJS will be thrilled to see the define() call above, and those who aren't should read the [section about require js](#require-js)for short summary.
 
 ##### Generate a Router:
 
